@@ -94,8 +94,39 @@
                 <title id="hero-map-title">대전 서구 행정동 지도. 국유지는 초록, 시유지는 노랑, 구유지는 파랑으로 임의 위치에 표시되어 있고, 빌리거나 살 수 있는 땅은 빗금으로 구분됩니다. 드론이 서구청에서 출발해 활용 가능한 두 필지를 차례로 촬영 조사합니다.</title>
                 <defs>
                   <pattern id="hm-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.6" height="5" fill="rgba(15, 34, 51, 0.7)"/></pattern>
+
+                  <!-- 수채화 색: 천천히 바뀌는 그라데이션 -->
+                  <linearGradient id="hm-wash-grad" gradientUnits="userSpaceOnUse" x1="470" y1="-60" x2="960" y2="560" spreadMethod="reflect">
+                    <stop offset="0" stop-color="#7fc4d8"><animate attributeName="stop-color" values="#7fc4d8;#9fb3ec;#86cfc8;#7fc4d8" dur="14s" repeatCount="indefinite"/></stop>
+                    <stop offset="0.5" stop-color="#a9c8f0"><animate attributeName="stop-color" values="#a9c8f0;#88d0c9;#b5b8ee;#a9c8f0" dur="14s" repeatCount="indefinite"/></stop>
+                    <stop offset="1" stop-color="#8fd0cb"><animate attributeName="stop-color" values="#8fd0cb;#a6c6f2;#9cb6e6;#8fd0cb" dur="14s" repeatCount="indefinite"/></stop>
+                    <animateTransform attributeName="gradientTransform" type="rotate" values="0 715 250;35 715 250;0 715 250" dur="22s" repeatCount="indefinite"/>
+                  </linearGradient>
+
+                  <!-- 수채화 번짐: 가장자리를 불규칙하게 -->
+                  <filter id="hm-watercolor" x="-10%" y="-10%" width="120%" height="120%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="7" result="noise"/>
+                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G" result="warp"/>
+                    <feGaussianBlur in="warp" stdDeviation="2.5"/>
+                  </filter>
+                  <filter id="hm-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>
+
+                  <!-- 행정동 모양대로 색을 담는 마스크(스크립트로 채움) -->
+                  <mask id="hm-wash-mask" maskUnits="userSpaceOnUse" x="-400" y="-200" width="1800" height="2300">
+                    <g id="hm-wash-shapes" filter="url(#hm-watercolor)"></g>
+                  </mask>
+
+                  <!-- 처음 열 때 붓질처럼 색이 번져 나오는 마스크 -->
+                  <mask id="hm-reveal" maskUnits="userSpaceOnUse" x="-400" y="-200" width="1800" height="2300">
+                    <circle id="hm-reveal-circle" cx="715" cy="250" r="0" fill="#fff" filter="url(#hm-soft)">
+                      <animate attributeName="r" from="0" to="2000" begin="0.3s" dur="3s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.25 0.6 0.3 1"/>
+                    </circle>
+                  </mask>
                 </defs>
                 <rect class="hm-base" x="-400" y="-200" width="1800" height="2300"/>
+                <g mask="url(#hm-reveal)">
+                  <rect class="hm-wash" x="-400" y="-200" width="1800" height="2300" fill="url(#hm-wash-grad)" mask="url(#hm-wash-mask)"/>
+                </g>
 
                 <!-- 행정동 경계와 필지 표시(스크립트로 그림) -->
                 <g id="hm-dongs"></g>

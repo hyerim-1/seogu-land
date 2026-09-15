@@ -20,14 +20,14 @@
   --navy-tint: #e6edf4;
 
   --kuk: #1e7f55;        /* 국유 */
-  --kuk-mid: #6cc093;
+  --kuk-mid: #2e9d68;
   --kuk-tint: #cfe8da;
   --si: #b58600;         /* 시유 */
-  --si-mid: #f3c64b;
+  --si-mid: #f0b429;
   --si-tint: #fbe8a6;
   --si-text: #6f5200;
   --gu: #2f6fb0;         /* 구유 */
-  --gu-mid: #74a6db;
+  --gu-mid: #3b7cc9;
   --gu-tint: #d3e3f4;
 
   --hatch-line: rgba(15, 34, 51, 0.6);
@@ -129,6 +129,23 @@ button, input { font: inherit; color: inherit; }
   gap: clamp(32px, 4.5vw, 64px);
   align-items: center;
 }
+/* 첫 화면 뒤로 천천히 흐르는 수채화 색 */
+.hero { position: relative; overflow: hidden; isolation: isolate; }
+.hero::before {
+  content: ""; position: absolute; inset: -20%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38% 46% at 18% 28%, rgba(127, 196, 216, 0.30), transparent 70%),
+    radial-gradient(34% 42% at 82% 18%, rgba(169, 200, 240, 0.34), transparent 70%),
+    radial-gradient(42% 48% at 64% 88%, rgba(181, 184, 238, 0.26), transparent 70%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero::before { animation: wash-drift 26s ease-in-out infinite alternate; }
+}
+@keyframes wash-drift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to { transform: translate3d(3%, 3%, 0) scale(1.08); }
+}
+
 .slogan {
   display: flex; align-items: center; gap: 10px;
   font-size: 0.9375rem; font-weight: 600; color: var(--kuk); margin-bottom: 18px;
@@ -216,7 +233,9 @@ button, input { font: inherit; color: inherit; }
 
 /* 첫 화면 지도: 행정동 지도와 필지 표시 */
 .hm-base { fill: var(--map-base); }
-#hero-svg .dong { fill: var(--map-parcel); stroke: #b3bec9; stroke-width: 2; stroke-linejoin: round; transition: stroke-opacity .2s; }
+/* 수채화 그라데이션 위에 흰 행정동 경계선 */
+.hm-wash { opacity: 0.72; }
+#hero-svg .dong { fill: none; stroke: #fff; stroke-width: 3; stroke-linejoin: round; transition: stroke-opacity .2s; }
 #hero-svg .outline { fill: none; stroke: var(--navy); stroke-width: 4; stroke-linejoin: round; }
 #hero-svg .name {
   font-family: var(--font); font-size: 20px; font-weight: 600; fill: var(--ink-soft);
@@ -225,10 +244,10 @@ button, input { font: inherit; color: inherit; }
 }
 #hero-svg .neighbor { font-family: var(--font); font-size: 30px; font-weight: 700; fill: #aab4be; text-anchor: middle; dominant-baseline: central; }
 #hm-labels { transition: opacity .2s; }
-.hm-lot-body { stroke-width: 1.4; }
-.hm-lot-kuk .hm-lot-body { fill: var(--kuk-mid); stroke: var(--kuk); }
-.hm-lot-si .hm-lot-body { fill: var(--si-mid); stroke: var(--si); }
-.hm-lot-gu .hm-lot-body { fill: var(--gu-mid); stroke: var(--gu); }
+.hm-lot-body { stroke: #fff; stroke-width: 2; }
+.hm-lot-kuk .hm-lot-body { fill: var(--kuk-mid); }
+.hm-lot-si .hm-lot-body { fill: var(--si-mid); }
+.hm-lot-gu .hm-lot-body { fill: var(--gu-mid); }
 .hm-hatch { pointer-events: none; }
 .hm-landmark rect { fill: #d4dce4; stroke: var(--navy); stroke-width: 1.5; }
 .hm-landmark path { stroke: var(--navy); stroke-width: 2; }

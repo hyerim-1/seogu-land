@@ -529,7 +529,29 @@ async function renderHeroMap() {
     return;
   }
   const dongs = [...dongLayer.querySelectorAll('.dong')];
+
+  // 행정동 모양을 수채화 마스크에 복사해 그라데이션 색을 담음
+  const washShapes = document.getElementById('hm-wash-shapes');
+  if (washShapes) {
+    dongs.forEach((dong) => {
+      const shape = dong.cloneNode(false);
+      shape.removeAttribute('id');
+      shape.removeAttribute('class');
+      shape.setAttribute('fill', '#fff');
+      washShapes.appendChild(shape);
+    });
+  }
+
   if (dongs.length && typeof dongs[0].isPointInFill === 'function') scatterHeroLots(dongs, lotLayer);
+}
+
+// 움직임 줄이기 설정이면 수채화 색 변화와 번짐 효과를 멈추고 완성된 모습만 보여줌
+function initWatercolor() {
+  const svg = document.getElementById('hero-svg');
+  if (!svg || !matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  svg.querySelectorAll('#hm-wash-grad animate, #hm-wash-grad animateTransform, #hm-reveal-circle animate')
+    .forEach((anim) => anim.remove());
+  document.getElementById('hm-reveal-circle')?.setAttribute('r', '2000');
 }
 
 // 확대(도심) / 축소(서구 전체) 버튼
@@ -653,6 +675,7 @@ function initDrone() {
   play();
 }
 
+initWatercolor();
 renderHeroMap();
 initLayers();
 initZoom();
