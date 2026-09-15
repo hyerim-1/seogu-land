@@ -229,7 +229,8 @@ h3 { font-size: 1.1875rem; line-height: 1.4; letter-spacing: -0.01em; }
 .mini-list li span:last-child { margin-left: auto; font-weight: 400; color: var(--ink-soft); font-size: 0.875rem; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--use); flex: none; }
 
-.mini-drawings { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mini-drawings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.md-cur-target { fill: none; stroke: #ffd84d; stroke-width: 2; stroke-dasharray: 4 3; }
 .mini-drawings figure { margin: 0; }
 .mini-drawings svg { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--line); }
 .mini-drawings figcaption { font-size: 0.875rem; color: var(--ink-soft); margin-top: 6px; text-align: center; }
@@ -292,7 +293,15 @@ h3 { font-size: 1.1875rem; line-height: 1.4; letter-spacing: -0.01em; }
 .card-facts dd { margin: 2px 0 0; font-weight: 500; }
 
 .drawing { margin-top: 18px; }
-.drawing-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.drawing-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 8px; }
+.drawing-note { margin-top: 8px; font-size: 0.8125rem; color: var(--ink-soft); text-align: center; }
+.drawing-svg .cur-lane { stroke: #e8e3cf; stroke-width: 1.2; stroke-dasharray: 6 5; vector-effect: non-scaling-stroke; }
+.drawing-svg .cur-lot { stroke: rgba(255, 255, 255, 0.3); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.drawing-svg .cur-ridge { stroke: rgba(255, 255, 255, 0.45); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.drawing-svg .cur-target { fill: none; stroke: #ffd84d; stroke-width: 3; stroke-dasharray: 8 5; vector-effect: non-scaling-stroke; }
+.drawing-svg .cur-label { fill: #fff; font-weight: 700; text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: rgba(30, 43, 35, 0.85); stroke-linejoin: round; }
+.drawing-svg .dw-north.on-photo { stroke: #fff; }
+.drawing-svg .dw-north-n.on-photo { fill: #fff; }
 .drawing-title { font-weight: 700; font-size: 0.9375rem; }
 .seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 8px; overflow: hidden; }
 .seg button {

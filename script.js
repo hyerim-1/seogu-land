@@ -19,6 +19,7 @@ const PARCELS = [
     statusDetail: '주거용으로 대부 중이며, 대부 기간은 2025년 3월부터 2030년 2월까지입니다.',
     docs: { apply: false, buy: true, giveup: true },
     hint: '이미 대부 중인 땅이라 새 사용(대부)허가 신청은 받지 않습니다. 현재 대부받은 분은 매수신청서나 포기서를 낼 수 있습니다.',
+    use: 'house', useText: '단독주택 1동과 마당이 있습니다.',
     points: [[96, 12], [190, 12], [186, 76], [90, 80]],
   },
   {
@@ -27,6 +28,7 @@ const PARCELS = [
     statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
     docs: { apply: true, buy: true, giveup: false },
     hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
+    use: 'bare', useText: '건물 없이 비어 있는 땅입니다.',
     points: [[90, 80], [244, 74], [244, 164], [84, 164]],
   },
   {
@@ -35,6 +37,7 @@ const PARCELS = [
     statusDetail: '주민 텃밭으로 사용허가 중이며, 허가 기간은 2026년 12월까지입니다.',
     docs: { apply: false, buy: false, giveup: true },
     hint: '공원은 행정재산이라 매각 대상이 아닙니다. 현재 사용허가를 받은 분은 포기서를 낼 수 있습니다.',
+    use: 'garden', useText: '주민 텃밭으로 가꾸고 있습니다.',
     points: [[372, 12], [468, 12], [468, 88], [372, 92]],
   },
   {
@@ -43,6 +46,7 @@ const PARCELS = [
     statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
     docs: { apply: true, buy: true, giveup: false },
     hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
+    use: 'field', useText: '밭고랑만 남아 있고 경작하지 않고 있습니다.',
     points: [[372, 92], [468, 88], [468, 164], [380, 164]],
   },
   {
@@ -51,6 +55,7 @@ const PARCELS = [
     statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
     docs: { apply: true, buy: true, giveup: false },
     hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
+    use: 'paddy', useText: '논이었던 땅으로, 지금은 벼를 심지 않고 있습니다.',
     points: [[12, 200], [128, 200], [120, 290], [12, 296]],
   },
   {
@@ -59,6 +64,7 @@ const PARCELS = [
     statusDetail: '공영주차장으로 사용허가 중이며, 허가 기간은 2027년 6월까지입니다.',
     docs: { apply: false, buy: false, giveup: true },
     hint: '행정재산으로 쓰이고 있어 매각 대상이 아닙니다. 현재 사용허가를 받은 분은 포기서를 낼 수 있습니다.',
+    use: 'parking', useText: '공영주차장으로 쓰고 있습니다.',
     points: [[360, 200], [468, 200], [468, 348], [352, 348], [356, 270]],
   },
 ];
@@ -175,9 +181,11 @@ function renderCard(parcel) {
         <div class="seg" role="group" aria-label="도면 종류">
           <button type="button" data-drawing="cadastral">지적도</button>
           <button type="button" data-drawing="location">위치도</button>
+          <button type="button" data-drawing="current">현황도</button>
         </div>
       </div>
       <svg class="drawing-svg" role="img"></svg>
+      <p class="drawing-note"></p>
     </div>
     <div class="docs">
       <p class="docs-title">서류 신청</p>
@@ -213,38 +221,150 @@ function setDrawing(kind) {
   svg.replaceChildren();
 
   if (kind === 'cadastral') drawCadastral(svg, parcel);
+  else if (kind === 'current') drawCurrent(svg, parcel);
   else drawLocation(svg, parcel);
+
+  const note = document.querySelector('#demo-card .drawing-note');
+  if (note) note.textContent = kind === 'current' ? `${parcel.useText} 그림으로 표현한 예시 현황도입니다.` : DRAWING_NOTE[kind];
 }
 
-function drawCadastral(svg, parcel) {
-  // 대상 필지 둘레를 4:3 비율로 확대
+const DRAWING_NOTE = {
+  cadastral: '필지의 경계와 모양, 지번을 보여줍니다.',
+  location: '주변 도로와 블록 속에서 어디에 있는지 보여줍니다.',
+};
+
+// 대상 필지 둘레를 4:3 비율로 확대한 viewBox
+function fitView(parcel) {
   const xs = parcel.points.map((p) => p[0]);
   const ys = parcel.points.map((p) => p[1]);
   const pad = 34;
   let w = Math.max(...xs) - Math.min(...xs) + pad * 2;
   let h = Math.max(...ys) - Math.min(...ys) + pad * 2;
   if (w / h > 4 / 3) h = w * 3 / 4; else w = h * 4 / 3;
-  const [cx, cy] = centroid(parcel.points);
   const x0 = (Math.min(...xs) + Math.max(...xs)) / 2 - w / 2;
   const y0 = (Math.min(...ys) + Math.max(...ys)) / 2 - h / 2;
+  return { x0, y0, w, h, fs: w / 18 };
+}
+
+function drawNorth(svg, { x0, y0, w, fs }, cls = '') {
+  const nx = x0 + w - fs * 1.4, ny = y0 + fs * 1.1;
+  svgEl('path', { class: `dw-north ${cls}`, d: `M${nx} ${ny + fs * 1.6} L${nx} ${ny + fs * 0.3} M${nx - fs * 0.35} ${ny + fs * 0.75} L${nx} ${ny + fs * 0.3} L${nx + fs * 0.35} ${ny + fs * 0.75}` }, svg);
+  const n = svgEl('text', { class: `dw-north-n ${cls}`, x: nx, y: ny + fs * 0.1, 'font-size': fs * 0.7 }, svg);
+  n.textContent = 'N';
+}
+
+function drawCadastral(svg, parcel) {
+  const view = fitView(parcel);
+  const { x0, y0, w, h, fs } = view;
   svg.setAttribute('viewBox', `${x0} ${y0} ${w} ${h}`);
   svg.setAttribute('aria-label', `${parcel.jibun} 지적도. 대상 필지 경계가 굵은 선으로 표시되어 있습니다.`);
 
-  const fs = w / 18;
   [...PRIVATE_LOTS, ...PARCELS.filter((p) => p.id !== parcel.id).map((p) => p.points)]
     .forEach((pts) => svgEl('polygon', { class: 'dw-lot', points: toPoints(pts) }, svg));
   svgEl('polygon', { class: 'dw-target', points: toPoints(parcel.points) }, svg);
 
+  const [cx, cy] = centroid(parcel.points);
   const no = svgEl('text', { class: 'dw-label', x: cx, y: cy, 'font-size': fs }, svg);
   no.textContent = `${lotNumber(parcel.jibun)} ${parcel.jimok}`;
   const area = svgEl('text', { class: 'dw-sub', x: cx, y: cy + fs * 1.3, 'font-size': fs * 0.75 }, svg);
   area.textContent = formatArea(parcel.area);
 
-  // 방위 표시
-  const nx = x0 + w - fs * 1.4, ny = y0 + fs * 1.1;
-  svgEl('path', { class: 'dw-north', d: `M${nx} ${ny + fs * 1.6} L${nx} ${ny + fs * 0.3} M${nx - fs * 0.35} ${ny + fs * 0.75} L${nx} ${ny + fs * 0.3} L${nx + fs * 0.35} ${ny + fs * 0.75}` }, svg);
-  const n = svgEl('text', { class: 'dw-north-n', x: nx, y: ny + fs * 0.1, 'font-size': fs * 0.7 }, svg);
-  n.textContent = 'N';
+  drawNorth(svg, view);
+}
+
+// ---------- 현황도: 위에서 내려다본 모습(그림 예시) ----------
+const ROOF_COLORS = ['#8d99a6', '#a88b6e', '#7f8c7d', '#9a8fa0'];
+const CAR_COLORS = ['#f4f1e6', '#c0392b', '#2f4f6f', '#d9d4c5'];
+const scalePoints = (pts, k) => {
+  const [cx, cy] = centroid(pts);
+  return pts.map(([x, y]) => [cx + (x - cx) * k, cy + (y - cy) * k]);
+};
+
+function addPatterns(defs) {
+  const stripes = (id, bg, line, size, angle) => {
+    const p = svgEl('pattern', { id, width: size, height: size, patternUnits: 'userSpaceOnUse', patternTransform: `rotate(${angle})` }, defs);
+    svgEl('rect', { width: size, height: size, fill: bg }, p);
+    svgEl('rect', { width: size, height: size * 0.45, fill: line }, p);
+  };
+  stripes('cur-garden', '#93b872', '#6f9a55', 9, 90);
+  stripes('cur-field', '#c4aa78', '#a88d5f', 10, 12);
+  stripes('cur-paddy', '#9bbfa9', '#86ad97', 8, -8);
+
+  const bare = svgEl('pattern', { id: 'cur-bare', width: 14, height: 14, patternUnits: 'userSpaceOnUse' }, defs);
+  svgEl('rect', { width: 14, height: 14, fill: '#cfb994' }, bare);
+  svgEl('circle', { cx: 3, cy: 4, r: 1.3, fill: '#b39c75' }, bare);
+  svgEl('circle', { cx: 10, cy: 10, r: 1.1, fill: '#e2d2ae' }, bare);
+
+  const parking = svgEl('pattern', { id: 'cur-parking', width: 16, height: 36, patternUnits: 'userSpaceOnUse' }, defs);
+  svgEl('rect', { width: 16, height: 36, fill: '#6d7174' }, parking);
+  svgEl('rect', { width: 1.2, height: 26, fill: '#f4f1e6' }, parking);
+}
+
+function paintUse(svg, defs, p) {
+  const clipId = `cur-clip-${p.id}`;
+  const clip = svgEl('clipPath', { id: clipId }, defs);
+  svgEl('polygon', { points: toPoints(p.points) }, clip);
+  const g = svgEl('g', { 'clip-path': `url(#${clipId})` }, svg);
+  const fill = { house: '#c9c3a6', bare: 'url(#cur-bare)', garden: 'url(#cur-garden)', field: 'url(#cur-field)', paddy: 'url(#cur-paddy)', parking: 'url(#cur-parking)' }[p.use];
+  svgEl('polygon', { points: toPoints(p.points), fill }, g);
+  const [cx, cy] = centroid(p.points);
+
+  if (p.use === 'house') {
+    const roof = scalePoints(p.points, 0.5);
+    svgEl('polygon', { points: toPoints(roof.map(([x, y]) => [x + 3, y + 3])), fill: 'rgba(30,43,35,.3)' }, g);
+    svgEl('polygon', { points: toPoints(roof), fill: '#6f7f8c' }, g);
+    const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    const [l, r] = [mid(roof[0], roof[3]), mid(roof[1], roof[2])];
+    svgEl('line', { x1: l[0], y1: l[1], x2: r[0], y2: r[1], class: 'cur-ridge' }, g);
+    svgEl('circle', { cx: roof[0][0] - 8, cy: roof[3][1] + 8, r: 6, fill: '#5f8f4e' }, g);
+  }
+  if (p.use === 'bare' || p.use === 'field') {
+    scalePoints(p.points, 0.62).forEach(([x, y]) => svgEl('circle', { cx: x, cy: y, r: 4.5, fill: '#8fa86b' }, g));
+  }
+  if (p.use === 'garden') {
+    svgEl('rect', { x: cx + 18, y: cy - 30, width: 16, height: 12, fill: '#e8e3cf', stroke: '#6b5b45', 'stroke-width': 1 }, g);
+  }
+  if (p.use === 'parking') {
+    [[-40, -62], [-8, -62], [24, -62], [-40, 8], [8, 8], [24, 8]].forEach(([dx, dy], i) => {
+      svgEl('rect', { x: cx + dx + 3, y: cy + dy + 4, width: 10, height: 18, rx: 2.5, fill: CAR_COLORS[i % CAR_COLORS.length] }, g);
+    });
+  }
+}
+
+function drawCurrent(svg, parcel) {
+  const view = fitView(parcel);
+  const { x0, y0, w, h, fs } = view;
+  svg.setAttribute('viewBox', `${x0} ${y0} ${w} ${h}`);
+  svg.setAttribute('aria-label', `${parcel.jibun} 현황도. ${parcel.useText} 위에서 내려다본 모습을 그림으로 표현했습니다.`);
+
+  const defs = svgEl('defs', {}, svg);
+  addPatterns(defs);
+
+  svgEl('rect', { x: x0, y: y0, width: w, height: h, fill: '#8fa37a' }, svg);
+  ROADS.forEach((r) => {
+    svgEl('rect', { x: r.x, y: r.y, width: r.w, height: r.h, fill: '#5d6166' }, svg);
+    const lane = r.vertical
+      ? { x1: r.x + r.w / 2, y1: r.y, x2: r.x + r.w / 2, y2: r.y + r.h }
+      : { x1: r.x, y1: r.y + r.h / 2, x2: r.x + r.w, y2: r.y + r.h / 2 };
+    svgEl('line', { ...lane, class: 'cur-lane' }, svg);
+  });
+
+  PRIVATE_LOTS.forEach((pts, i) => {
+    svgEl('polygon', { points: toPoints(pts), fill: '#b9b39a', class: 'cur-lot' }, svg);
+    const roof = scalePoints(pts, 0.55);
+    svgEl('polygon', { points: toPoints(roof.map(([x, y]) => [x + 3, y + 3])), fill: 'rgba(30,43,35,.28)' }, svg);
+    svgEl('polygon', { points: toPoints(roof), fill: ROOF_COLORS[i % ROOF_COLORS.length] }, svg);
+    const [tx, ty] = scalePoints(pts, 0.86)[i % pts.length];
+    svgEl('circle', { cx: tx, cy: ty, r: 5.5, fill: '#5f8f4e' }, svg);
+  });
+  PARCELS.forEach((p) => paintUse(svg, defs, p));
+
+  svgEl('polygon', { class: 'cur-target', points: toPoints(parcel.points) }, svg);
+  const [cx, cy] = centroid(parcel.points);
+  const label = svgEl('text', { class: 'cur-label', x: cx, y: cy, 'font-size': fs, 'stroke-width': fs * 0.22 }, svg);
+  label.textContent = lotNumber(parcel.jibun);
+
+  drawNorth(svg, view, 'on-photo');
 }
 
 function drawLocation(svg, parcel) {

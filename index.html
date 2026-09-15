@@ -254,7 +254,7 @@
 
           <article class="sheet">
             <h3>도면 보기</h3>
-            <p>필지의 경계와 모양은 지적도로, 주변 도로와 건물 속 위치는 위치도로 확인합니다.</p>
+            <p>필지의 경계와 모양은 지적도로, 주변 도로와 건물 속 위치는 위치도로, 지금 땅이 어떻게 쓰이고 있는지는 현황도로 확인합니다.</p>
             <div class="mini-drawings">
               <figure>
                 <svg viewBox="0 0 120 90" aria-hidden="true">
@@ -273,6 +273,18 @@
                   <circle class="md-pin" cx="93" cy="20" r="4"/>
                 </svg>
                 <figcaption>위치도</figcaption>
+              </figure>
+              <figure>
+                <svg viewBox="0 0 120 90" aria-hidden="true">
+                  <rect width="120" height="90" fill="#8fa37a"/>
+                  <rect x="0" y="40" width="120" height="10" fill="#5d6166"/>
+                  <rect x="56" y="0" width="10" height="90" fill="#5d6166"/>
+                  <g fill="#b9b39a"><path d="M6 6h44v28H6zM6 56h44v28H6zM72 56h42v28H72z"/></g>
+                  <g fill="#8d99a6"><rect x="14" y="12" width="26" height="16"/><rect x="16" y="62" width="22" height="16"/><rect x="82" y="62" width="24" height="16"/></g>
+                  <rect x="72" y="6" width="42" height="28" fill="#cfb994"/>
+                  <rect class="md-cur-target" x="72" y="6" width="42" height="28"/>
+                </svg>
+                <figcaption>현황도</figcaption>
               </figure>
             </div>
           </article>
@@ -325,7 +337,7 @@
         <div class="tab-panel" role="tabpanel" id="panel-resident" aria-labelledby="tab-resident">
           <ol class="steps">
             <li><h3>검색</h3><p>지번이나 동 이름으로 우리동네 국·공유재산을 찾습니다.</p></li>
-            <li><h3>정보 확인</h3><p>지목, 면적, 소유자, 사용·대부 현황과 지적도·위치도를 확인합니다.</p></li>
+            <li><h3>정보 확인</h3><p>지목, 면적, 소유자, 사용·대부 현황과 지적도·위치도·현황도를 확인합니다.</p></li>
             <li><h3>서류 작성·제출</h3><p>사용(대부)허가 신청서, 매수신청서, 사용(대부)허가 포기서를 온라인으로 작성해 냅니다.</p></li>
             <li><h3>처리 결과 알림</h3><p>접수, 검토, 허가 여부를 문자와 화면으로 받아 봅니다.</p></li>
           </ol>
@@ -334,7 +346,7 @@
         <div class="tab-panel" role="tabpanel" id="panel-officer" aria-labelledby="tab-officer" hidden>
           <ol class="steps">
             <li><h3>신청 접수</h3><p>온라인으로 들어온 신청서를 해당 필지 정보와 함께 한 화면에서 확인합니다.</p></li>
-            <li><h3>검토</h3><p>현재 사용·대부 현황과 지적도·위치도를 보며 허가할 수 있는지 판단합니다.</p></li>
+            <li><h3>검토</h3><p>현재 사용·대부 현황과 지적도·위치도·현황도를 보며 허가할 수 있는지 판단합니다.</p></li>
             <li><h3>허가·반려</h3><p>결과를 입력하면 신청인에게 바로 알림이 갑니다.</p></li>
             <li><h3>재산현황 자동 갱신</h3><p>허가, 포기, 매각 결과가 재산현황과 활용 가능 목록에 곧바로 반영됩니다.</p></li>
           </ol>
@@ -381,7 +393,7 @@
           <li>
             <span class="phase-no">1단계</span>
             <h3>재산 조회</h3>
-            <p>국·공유재산 정보 조회, 활용 가능 재산현황, 지적도·위치도 보기</p>
+            <p>국·공유재산 정보 조회, 활용 가능 재산현황, 지적도·위치도·현황도 보기</p>
           </li>
           <li>
             <span class="phase-no">2단계</span>
@@ -402,13 +414,14 @@
               <li>국유재산 공공데이터(공공데이터포털)</li>
               <li>서구 공유재산 대장</li>
               <li>연속지적도와 도로 정보(지적도·위치도 표시용)</li>
+              <li>항공사진(현황도 표시용)</li>
             </ul>
           </div>
           <div class="plan-box">
             <h3>기술 구성</h3>
             <ul>
               <li>화면: PC와 모바일에서 함께 쓰는 웹</li>
-              <li>지도: 공간정보 오픈 API로 지적도·위치도 표시</li>
+              <li>지도: 공간정보 오픈 API로 지적도·위치도와 항공사진 현황도 표시</li>
               <li>서버: 신청서 저장과 처리 상태 관리</li>
               <li>배포: GitHub와 Vercel</li>
             </ul>
