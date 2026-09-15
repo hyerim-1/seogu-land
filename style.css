@@ -125,7 +125,7 @@ button, input { font: inherit; color: inherit; }
 }
 .hero-inner {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
   gap: clamp(32px, 4.5vw, 64px);
   align-items: center;
 }
@@ -152,9 +152,10 @@ button, input { font: inherit; color: inherit; }
 }
 .slogan::before { content: ""; width: 24px; height: 2px; background: var(--kuk); }
 .hero h1 {
-  font-size: clamp(2.375rem, 4.6vw, 3.875rem);
-  line-height: 1.16; letter-spacing: -0.035em; font-weight: 700; color: var(--navy-deep);
+  font-size: clamp(2.125rem, 3.7vw, 3.25rem);
+  line-height: 1.22; letter-spacing: -0.035em; font-weight: 700; color: var(--navy-deep);
 }
+.hero h1 span { display: block; }
 .lede { margin-top: 22px; font-size: clamp(1.0625rem, 1.5vw, 1.25rem); font-weight: 500; line-height: 1.6; max-width: 30em; text-wrap: balance; }
 .lede-sub { margin-top: 10px; color: var(--ink-soft); max-width: 34em; text-wrap: pretty; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
