@@ -63,7 +63,7 @@
 
         <figure class="hero-map">
           <svg viewBox="0 0 600 520" role="img" aria-labelledby="hero-map-title">
-            <title id="hero-map-title">갑천이 흐르는 서구 동네지도 그림. 국유지와 공유지가 색으로 칠해져 있고, 빌리거나 살 수 있는 땅 세 곳에 번호 핀이 꽂혀 있습니다.</title>
+            <title id="hero-map-title">갑천이 흐르는 서구 동네지도 그림. 국유지와 공유지가 색으로 칠해져 있고, 빌리거나 살 수 있는 땅 세 곳에 번호 핀이 꽂혀 있고, 드론이 서구청에서 출발해 세 필지를 차례로 날아다니며 촬영 조사합니다.</title>
             <defs>
               <symbol id="hm-tree" viewBox="0 0 20 30"><rect x="8.8" y="16" width="2.4" height="14" fill="#8b6b4a"/><circle cx="10" cy="10" r="10" fill="#6fa46b"/><circle cx="6.5" cy="6.5" r="3.4" fill="#91c089"/></symbol>
               <symbol id="hm-pine" viewBox="0 0 20 30"><rect x="8.8" y="22" width="2.4" height="8" fill="#8b6b4a"/><polygon points="10,0 20,24 0,24" fill="#4e8a52"/><polygon points="10,0 10,24 0,24" fill="#62a063"/></symbol>
@@ -157,10 +157,52 @@
               <text class="hm-bubble-text" x="537" y="86">여기 다 있네!</text>
             </g>
 
+            <!-- 드론 조사 경로 -->
+            <path class="hm-route" d="M431 62L545 292L417 327L182 299Z"/>
+
             <!-- 활용 가능 번호 핀 -->
             <g transform="translate(545 300)"><g class="hm-pin hm-pin-1"><path d="M0 0C-3-7-13-11-13-21a13 13 0 1 1 26 0C13-11 3-7 0 0z"/><text y="-16.5">1</text></g></g>
             <g transform="translate(417 334)"><g class="hm-pin hm-pin-2"><path d="M0 0C-3-7-13-11-13-21a13 13 0 1 1 26 0C13-11 3-7 0 0z"/><text y="-16.5">2</text></g></g>
             <g transform="translate(182 306)"><g class="hm-pin hm-pin-3"><path d="M0 0C-3-7-13-11-13-21a13 13 0 1 1 26 0C13-11 3-7 0 0z"/><text y="-16.5">3</text></g></g>
+
+            <!-- 드론 촬영 범위 -->
+            <g class="hm-scan" id="hm-scan" transform="translate(545 292)">
+              <rect class="hm-scan-area" x="-36" y="-36" width="72" height="72"/>
+              <circle class="hm-scan-pulse" r="40"/>
+              <rect class="hm-scan-line" x="-36" y="-1" width="72" height="2"/>
+              <path class="hm-scan-frame" d="M-36 -24V-36H-24M24 -36H36V-24M36 24V36H24M-24 36H-36V24"/>
+            </g>
+
+            <!-- 조사 완료 표시 -->
+            <g class="hm-done" transform="translate(484 328)"><g class="hm-chip"><rect width="112" height="22" rx="11"/><circle cx="11" cy="11" r="7"/><path d="M7.5 11.2l2.4 2.4 4.6-4.8"/><text x="22" y="11.5">갈마동 314 완료</text></g></g>
+            <g class="hm-done" transform="translate(363 352)"><g class="hm-chip"><rect width="108" height="22" rx="11"/><circle cx="11" cy="11" r="7"/><path d="M7.5 11.2l2.4 2.4 4.6-4.8"/><text x="22" y="11.5">월평동 91 완료</text></g></g>
+            <g class="hm-done" transform="translate(122 334)"><g class="hm-chip"><rect width="120" height="22" rx="11"/><circle cx="11" cy="11" r="7"/><path d="M7.5 11.2l2.4 2.4 4.6-4.8"/><text x="22" y="11.5">도마동 45-3 완료</text></g></g>
+
+            <!-- 드론 -->
+            <g class="hm-drone-shadow" id="hm-drone-shadow" transform="translate(441 76)">
+              <path d="M-15 -15L15 15M15 -15L-15 15" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="-15" cy="-15" r="8"/><circle cx="15" cy="-15" r="8"/><circle cx="-15" cy="15" r="8"/><circle cx="15" cy="15" r="8"/>
+              <rect x="-9" y="-11" width="18" height="22" rx="5"/>
+            </g>
+            <g class="hm-drone" id="hm-drone" transform="translate(431 62)">
+              <path class="hm-arm" d="M-15 -15L15 15M15 -15L-15 15"/>
+              <g transform="translate(-15 -15)"><circle class="hm-rotor" r="9"/><line class="hm-prop" x1="-7" x2="7"/></g>
+              <g transform="translate(15 -15)"><circle class="hm-rotor" r="9"/><line class="hm-prop" x1="-7" x2="7"/></g>
+              <g transform="translate(-15 15)"><circle class="hm-rotor" r="9"/><line class="hm-prop" x1="-7" x2="7"/></g>
+              <g transform="translate(15 15)"><circle class="hm-rotor" r="9"/><line class="hm-prop" x1="-7" x2="7"/></g>
+              <rect class="hm-body" x="-9" y="-11" width="18" height="22" rx="5"/>
+              <circle class="hm-cam" cy="6" r="3"/>
+              <circle class="hm-led" cy="-6" r="1.8"/>
+            </g>
+
+            <!-- 조사 상태 표시 -->
+            <g class="hm-hud" transform="translate(404 468)">
+              <rect width="184" height="42" rx="8"/>
+              <circle class="hm-rec" cx="14" cy="14" r="4"/>
+              <text class="hm-hud-title" x="24" y="14.5">드론 현황조사</text>
+              <text class="hm-hud-meta" x="174" y="14.5">고도 120m</text>
+              <text class="hm-hud-status" id="hm-hud-status" x="12" y="30">이륙 준비</text>
+            </g>
 
             <!-- 방위표 -->
             <g class="hm-compass" transform="translate(60 476)">

@@ -423,6 +423,92 @@ function initTabs() {
   });
 }
 
+// ---------- 첫 화면: 드론 필지 순회 조사 ----------
+const DRONE_HOME = { x: 431, y: 62 }; // 서구청 옥상
+const SURVEY_SPOTS = [
+  { x: 545, y: 292, name: '갈마동 314' },
+  { x: 417, y: 327, name: '월평동 91' },
+  { x: 182, y: 299, name: '도마동 45-3' },
+];
+
+// 이륙 → 필지마다 이동·촬영 → 복귀를 한 바퀴로 반복
+function buildSurveySteps() {
+  const n = SURVEY_SPOTS.length;
+  const steps = [{ kind: 'rest', at: DRONE_HOME, dur: 1400, done: 0, status: '이륙 준비' }];
+  let from = DRONE_HOME;
+  SURVEY_SPOTS.forEach((spot, i) => {
+    steps.push({ kind: 'fly', from, to: spot, dur: i === 1 ? 1600 : 2200, done: i, status: `다음 필지로 이동 중 ${i + 1}/${n}` });
+    steps.push({ kind: 'scan', at: spot, dur: 1800, done: i, status: `${spot.name} 촬영 중 ${i + 1}/${n}` });
+    from = spot;
+  });
+  steps.push({ kind: 'fly', from, to: DRONE_HOME, dur: 2400, done: n, status: `조사 완료 ${n}/${n}, 복귀 중` });
+  steps.push({ kind: 'rest', at: DRONE_HOME, dur: 1600, done: n, status: `조사 완료 ${n}/${n}` });
+  return steps;
+}
+
+function initDrone() {
+  const drone = document.getElementById('hm-drone');
+  if (!drone) return;
+  const shadow = document.getElementById('hm-drone-shadow');
+  const scan = document.getElementById('hm-scan');
+  const status = document.getElementById('hm-hud-status');
+  const chips = [...document.querySelectorAll('.hm-done')];
+
+  const place = (x, y, tilt = 0) => {
+    drone.setAttribute('transform', `translate(${x} ${y}) rotate(${tilt})`);
+    shadow.setAttribute('transform', `translate(${x + 10} ${y + 14})`);
+  };
+  const apply = (step) => {
+    chips.forEach((chip, i) => chip.classList.toggle('is-on', i < step.done));
+    scan.classList.toggle('is-on', step.kind === 'scan');
+    if (step.kind === 'scan') scan.setAttribute('transform', `translate(${step.at.x} ${step.at.y})`);
+    status.textContent = step.status;
+  };
+
+  // 움직임 줄이기 설정이면 조사를 마치고 복귀한 정지 화면으로 보여줌
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const n = SURVEY_SPOTS.length;
+    place(DRONE_HOME.x, DRONE_HOME.y);
+    apply({ kind: 'rest', at: DRONE_HOME, done: n, status: `조사 완료 ${n}/${n}` });
+    return;
+  }
+
+  const steps = buildSurveySteps();
+  const total = steps.reduce((sum, s) => sum + s.dur, 0);
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+  let elapsed = 0, last = 0, current = -1, rafId = 0, inView = true;
+
+  function frame(now) {
+    elapsed = (elapsed + Math.min(now - (last || now), 100)) % total;
+    last = now;
+    let t = elapsed, i = 0;
+    while (t >= steps[i].dur) { t -= steps[i].dur; i += 1; }
+    const step = steps[i];
+    if (i !== current) { current = i; apply(step); }
+
+    if (step.kind === 'fly') {
+      const p = t / step.dur, k = ease(p);
+      const x = step.from.x + (step.to.x - step.from.x) * k;
+      const y = step.from.y + (step.to.y - step.from.y) * k;
+      place(x, y, Math.sin(p * Math.PI) * 10 * Math.sign(step.to.x - step.from.x));
+    } else {
+      place(step.at.x, step.at.y + Math.sin(now / 280) * 1.2);
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  // 화면에 보이지 않을 때는 멈춤
+  const play = () => { if (!rafId && inView && !document.hidden) { last = 0; rafId = requestAnimationFrame(frame); } };
+  const pause = () => { cancelAnimationFrame(rafId); rafId = 0; };
+  new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    if (inView) play(); else pause();
+  }).observe(drone.ownerSVGElement);
+  document.addEventListener('visibilitychange', () => (document.hidden ? pause() : play()));
+  play();
+}
+
 renderMap();
 selectParcel('P2');
 initTabs();
+initDrone();
