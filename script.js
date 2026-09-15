@@ -61,6 +61,10 @@ const PARCELS = [
     statusDetail: '주택이 들어서 있어 사용(대부)허가나 매수를 신청할 수 없습니다.',
     docs: { apply: false, buy: false, giveup: false },
     hint: '건물이 있는 땅이라 지금은 대부나 매각 대상이 아닙니다.',
+    photos: [
+      { src: 'images/domadong-45-3-aerial.jpg', label: '항공사진', source: '네이버 지도', alt: '도마동 45-3 일대 항공사진. 파란 선으로 필지 경계가 표시되어 있고 주변은 주택가입니다.' },
+      { src: 'images/domadong-45-3-site.jpg', label: '현장 사진', source: '네이버 지도 거리뷰', alt: '도마동 45-3 앞 골목에서 본 분홍색 2층 주택과 담장' },
+    ],
     zoning: { area: '제2종일반주거지역', district: '없음', zone: '가축사육제한구역' },
     use: 'house', useText: '주택이 들어서 있습니다.',
     points: [[12, 200], [128, 200], [120, 290], [12, 296]],
