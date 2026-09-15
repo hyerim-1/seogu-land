@@ -91,7 +91,7 @@
 
             <div class="gis-map">
               <svg class="gis-svg" id="hero-svg" viewBox="470 -60 490 620" role="img" aria-labelledby="hero-map-title">
-                <title id="hero-map-title">대전 서구 행정동 지도. 국유지는 초록, 시유지는 노랑, 구유지는 파랑으로 임의 위치에 표시되어 있고, 빌리거나 살 수 있는 땅은 빗금으로 구분됩니다. 드론이 서구청에서 출발해 활용 가능한 두 필지를 차례로 촬영 조사합니다.</title>
+                <title id="hero-map-title">대전 서구 행정동 지도. 국유지는 초록, 시유지는 노랑, 구유지는 파랑으로 임의 위치에 표시되어 있고, 빌리거나 살 수 있는 땅은 빗금으로 구분됩니다. 드론이 서구청에서 출발해 만년동, 월평1동, 탄방동의 활용 가능한 필지를 차례로 촬영 조사합니다.</title>
                 <defs>
                   <pattern id="hm-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.6" height="5" fill="rgba(15, 34, 51, 0.7)"/></pattern>
 
@@ -138,12 +138,13 @@
                 <text class="hm-label" x="840" y="198">서구청</text>
 
                 <!-- 드론 조사 경로와 대상 필지 번호 -->
-                <path class="hm-route" d="M840 170L660 240L592 300Z"/>
-                <g class="hm-marker" transform="translate(660 221)"><circle r="10"/><text>1</text></g>
+                <path class="hm-route" d="M840 170L728 46L592 300L805 263Z"/>
+                <g class="hm-marker" transform="translate(728 27)"><circle r="10"/><text>1</text></g>
                 <g class="hm-marker" transform="translate(592 281)"><circle r="10"/><text>2</text></g>
+                <g class="hm-marker" transform="translate(805 244)"><circle r="10"/><text>3</text></g>
 
                 <!-- 드론 촬영 범위 -->
-                <g class="hm-scan" id="hm-scan" transform="translate(660 240)">
+                <g class="hm-scan" id="hm-scan" transform="translate(728 46)">
                   <rect class="hm-scan-area" x="-30" y="-30" width="60" height="60"/>
                   <circle class="hm-scan-pulse" r="34"/>
                   <rect class="hm-scan-line" x="-30" y="-1" width="60" height="2"/>
@@ -151,8 +152,9 @@
                 </g>
 
                 <!-- 조사 완료 표시 -->
-                <g class="hm-done" transform="translate(604 256)"><g class="hm-chip"><rect width="112" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">갈마동 314 완료</text></g></g>
-                <g class="hm-done" transform="translate(538 316)"><g class="hm-chip"><rect width="108" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">월평동 91 완료</text></g></g>
+                <g class="hm-done" transform="translate(620 35)"><g class="hm-chip"><rect width="96" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">만년동 완료</text></g></g>
+                <g class="hm-done" transform="translate(538 316)"><g class="hm-chip"><rect width="104" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">월평1동 완료</text></g></g>
+                <g class="hm-done" transform="translate(756 280)"><g class="hm-chip"><rect width="96" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">탄방동 완료</text></g></g>
 
                 <!-- 드론 -->
                 <g class="hm-drone-shadow" id="hm-drone-shadow" transform="translate(850 184)">

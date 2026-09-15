@@ -598,21 +598,24 @@ function initLayers() {
 // ---------- 첫 화면: 드론 필지 순회 조사 ----------
 const DRONE_HOME = { x: 840, y: 170 }; // 서구청
 const SURVEY_SPOTS = [
-  { x: 660, y: 240, name: '갈마동 314' },
-  { x: 592, y: 300, name: '월평동 91' },
+  { x: 728, y: 46, name: '만년동' },
+  { x: 592, y: 300, name: '월평1동' },
+  { x: 805, y: 263, name: '탄방동' },
 ];
 
 // 이륙 → 필지마다 이동·촬영 → 복귀를 한 바퀴로 반복
 function buildSurveySteps() {
   const n = SURVEY_SPOTS.length;
+  // 비행 시간은 구간 거리에 맞춰 1.4~2.4초 사이로 정함
+  const flyTime = (a, b) => Math.round(Math.min(2400, Math.max(1400, Math.hypot(b.x - a.x, b.y - a.y) * 7)));
   const steps = [{ kind: 'rest', at: DRONE_HOME, dur: 1400, done: 0, status: '이륙 준비' }];
   let from = DRONE_HOME;
   SURVEY_SPOTS.forEach((spot, i) => {
-    steps.push({ kind: 'fly', from, to: spot, dur: i === 1 ? 1600 : 2200, done: i, status: `다음 필지로 이동 중 ${i + 1}/${n}` });
+    steps.push({ kind: 'fly', from, to: spot, dur: flyTime(from, spot), done: i, status: `다음 필지로 이동 중 ${i + 1}/${n}` });
     steps.push({ kind: 'scan', at: spot, dur: 1800, done: i, status: `${spot.name} 촬영 중 ${i + 1}/${n}` });
     from = spot;
   });
-  steps.push({ kind: 'fly', from, to: DRONE_HOME, dur: 2400, done: n, status: `조사 완료 ${n}/${n}, 복귀 중` });
+  steps.push({ kind: 'fly', from, to: DRONE_HOME, dur: flyTime(from, DRONE_HOME), done: n, status: `조사 완료 ${n}/${n}, 복귀 중` });
   steps.push({ kind: 'rest', at: DRONE_HOME, dur: 1600, done: n, status: `조사 완료 ${n}/${n}` });
   return steps;
 }
