@@ -377,6 +377,14 @@ h3 { font-size: 1.1875rem; line-height: 1.4; letter-spacing: -0.01em; }
 .drawing-svg .dw-north { fill: none; stroke: var(--ink); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
 .drawing-svg .dw-north-n { fill: var(--ink); font-weight: 700; text-anchor: middle; }
 
+.photos { margin-top: 18px; }
+.photo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.photo-grid figure { margin: 0; }
+.photo-grid a { display: block; overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.photo-grid img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.photo-grid figcaption { display: flex; flex-direction: column; margin-top: 6px; font-size: 0.8125rem; font-weight: 700; line-height: 1.4; }
+.photo-grid figcaption small { font-size: 0.75rem; font-weight: 400; color: var(--ink-soft); }
+
 .docs { margin-top: 18px; }
 .docs-title { font-weight: 700; font-size: 0.9375rem; margin-bottom: 8px; }
 .docs-list { display: grid; gap: 8px; }

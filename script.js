@@ -4,7 +4,7 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const OWNER_LABEL = { kuk: '국유', gong: '공유' };
-const STATUS_LABEL = { lease: '대부 중', permit: '사용허가 중', available: '활용 가능' };
+const STATUS_LABEL = { lease: '대부 중', permit: '사용허가 중', available: '활용 가능', unavailable: '대부 불가' };
 // 토지이음 토지이용계획 열람 페이지(새 창으로 열기)
 const EUM_LAND_PLAN_URL = 'https://www.eum.go.kr/web/ar/lu/luLandDet.jsp';
 const DOCS = [
@@ -56,13 +56,13 @@ const PARCELS = [
     points: [[372, 92], [468, 88], [468, 164], [380, 164]],
   },
   {
-    id: 'P5', jibun: '도마동 45-3', jimok: '답', area: 610.5,
-    owner: 'gong', ownerName: '대전광역시 서구', status: 'available',
-    statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
-    docs: { apply: true, buy: true, giveup: false },
-    hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
-    zoning: { area: '생산녹지지역', district: '없음', zone: '가축사육제한구역' },
-    use: 'paddy', useText: '논이었던 땅으로, 지금은 벼를 심지 않고 있습니다.',
+    id: 'P5', jibun: '도마동 45-3', jimok: '대', area: 610.5,
+    owner: 'gong', ownerName: '대전광역시 서구', status: 'unavailable',
+    statusDetail: '주택이 들어서 있어 사용(대부)허가나 매수를 신청할 수 없습니다.',
+    docs: { apply: false, buy: false, giveup: false },
+    hint: '건물이 있는 땅이라 지금은 대부나 매각 대상이 아닙니다.',
+    zoning: { area: '제2종일반주거지역', district: '없음', zone: '가축사육제한구역' },
+    use: 'house', useText: '주택이 들어서 있습니다.',
     points: [[12, 200], [128, 200], [120, 290], [12, 296]],
   },
   {
@@ -212,6 +212,17 @@ function renderCard(parcel) {
       <svg class="drawing-svg" role="img"></svg>
       <p class="drawing-note"></p>
     </div>
+    ${parcel.photos ? `
+    <div class="photos">
+      <p class="docs-title">실제 사진 샘플</p>
+      <div class="photo-grid">
+        ${parcel.photos.map((ph) => `
+          <figure>
+            <a href="${ph.src}" target="_blank" rel="noopener noreferrer"><img src="${ph.src}" alt="${ph.alt}" loading="lazy"><span class="sr-only">(원본 크기로 새 창에서 보기)</span></a>
+            <figcaption>${ph.label}<small>출처: ${ph.source}</small></figcaption>
+          </figure>`).join('')}
+      </div>
+    </div>` : ''}
     <div class="docs">
       <p class="docs-title">서류 신청</p>
       <div class="docs-list">
@@ -453,7 +464,6 @@ const DRONE_HOME = { x: 431, y: 62 }; // 서구청 옥상
 const SURVEY_SPOTS = [
   { x: 545, y: 292, name: '갈마동 314' },
   { x: 417, y: 327, name: '월평동 91' },
-  { x: 182, y: 299, name: '도마동 45-3' },
 ];
 
 // 이륙 → 필지마다 이동·촬영 → 복귀를 한 바퀴로 반복
