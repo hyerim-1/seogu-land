@@ -29,7 +29,8 @@
 
 ## 배포
 
-- 배포 주소: (Vercel 배포 후 추가)
+- 배포 주소: https://seogu-land.vercel.app
+- GitHub 저장소에 올리면 Vercel이 자동으로 다시 배포합니다.
 
 ---
 
