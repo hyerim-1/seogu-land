@@ -81,62 +81,55 @@
           <div class="gis-body">
             <fieldset class="gis-layers">
               <legend>레이어</legend>
-              <label><input type="checkbox" data-layer="cadastral" checked><span class="lyr lyr-cad" aria-hidden="true"></span>지적 경계</label>
+              <label><input type="checkbox" data-layer="dong" checked><span class="lyr lyr-dong" aria-hidden="true"></span>행정동 경계</label>
               <label><input type="checkbox" data-layer="kuk" checked><span class="lyr lyr-kuk" aria-hidden="true"></span>국유지</label>
-              <label><input type="checkbox" data-layer="gong" checked><span class="lyr lyr-gong" aria-hidden="true"></span>공유지</label>
+              <label><input type="checkbox" data-layer="si" checked><span class="lyr lyr-si" aria-hidden="true"></span>시유지</label>
+              <label><input type="checkbox" data-layer="gu" checked><span class="lyr lyr-gu" aria-hidden="true"></span>구유지</label>
               <label><input type="checkbox" data-layer="use" checked><span class="lyr lyr-use" aria-hidden="true"></span>활용 가능</label>
               <label><input type="checkbox" data-layer="route" checked><span class="lyr lyr-route" aria-hidden="true"></span>드론 경로</label>
             </fieldset>
 
             <div class="gis-map">
-              <svg class="gis-svg" id="hero-svg" viewBox="0 0 600 520" role="img" aria-labelledby="hero-map-title">
-                <title id="hero-map-title">서구 국·공유재산 지도 화면 예시. 지적 경계 위에 국유지는 초록, 공유지는 파랑, 빌리거나 살 수 있는 땅은 노랑으로 표시되어 있고, 드론이 서구청에서 출발해 활용 가능한 두 필지를 차례로 촬영 조사합니다.</title>
-                <rect class="hm-base" width="600" height="520"/>
-                <path class="hm-grid" d="M0 100H600M0 200H600M0 300H600M0 400H600M0 500H600M100 0V520M200 0V520M300 0V520M400 0V520M500 0V520"/>
+              <svg class="gis-svg" id="hero-svg" viewBox="470 -60 490 620" role="img" aria-labelledby="hero-map-title">
+                <title id="hero-map-title">대전 서구 행정동 지도. 국유지는 초록, 시유지는 노랑, 구유지는 파랑으로 임의 위치에 표시되어 있고, 빌리거나 살 수 있는 땅은 빗금으로 구분됩니다. 드론이 서구청에서 출발해 활용 가능한 두 필지를 차례로 촬영 조사합니다.</title>
+                <defs>
+                  <pattern id="hm-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.6" height="5" fill="rgba(15, 34, 51, 0.7)"/></pattern>
+                </defs>
+                <rect class="hm-base" x="-400" y="-200" width="1800" height="2300"/>
 
-                <!-- 갑천 -->
-                <path class="hm-water" d="M78 -10 C48 70 128 120 96 200 S34 320 118 396 S330 476 610 446"/>
-                <text class="hm-water-name" x="84" y="108">갑천</text>
-
-                <!-- 도로 -->
-                <path class="hm-casing" d="M140 115H600M130 360H600M255 0V430M490 0V430"/>
-                <path class="hm-casing hm-main" d="M0 240H600M370 0V438"/>
-                <path class="hm-road" d="M140 115H600M130 360H600M255 0V430M490 0V430"/>
-                <path class="hm-road hm-main" d="M0 240H600M370 0V438"/>
-
-                <!-- 필지(스크립트로 그림) -->
+                <!-- 행정동 경계와 필지 표시(스크립트로 그림) -->
+                <g id="hm-dongs"></g>
                 <g id="hm-parcels"></g>
+                <g id="hm-labels"></g>
 
                 <!-- 서구청 -->
-                <rect class="hm-landmark" x="394" y="16" width="74" height="74" rx="2"/>
-                <text class="hm-label" x="431" y="104">서구청</text>
-                <text class="hm-road-name" x="315" y="240">계룡로</text>
-                <text class="hm-road-name vertical" x="370" y="286">대덕대로</text>
+                <g class="hm-landmark" transform="translate(840 170)"><rect x="-14" y="-12" width="28" height="24" rx="2"/><path d="M-8 -5h4M-2 -5h4M4 -5h4M-8 2h4M4 2h4"/></g>
+                <text class="hm-label" x="840" y="198">서구청</text>
 
-                <!-- 드론 조사 경로와 대상 필지 -->
-                <path class="hm-route" d="M431 53L521 275L404.5 327.5Z"/>
-                <g class="hm-marker" transform="translate(521 275)"><circle r="11"/><text>1</text></g>
-                <g class="hm-marker" transform="translate(404.5 327.5)"><circle r="11"/><text>2</text></g>
+                <!-- 드론 조사 경로와 대상 필지 번호 -->
+                <path class="hm-route" d="M840 170L660 240L592 300Z"/>
+                <g class="hm-marker" transform="translate(660 221)"><circle r="10"/><text>1</text></g>
+                <g class="hm-marker" transform="translate(592 281)"><circle r="10"/><text>2</text></g>
 
                 <!-- 드론 촬영 범위 -->
-                <g class="hm-scan" id="hm-scan" transform="translate(521 275)">
-                  <rect class="hm-scan-area" x="-32" y="-32" width="64" height="64"/>
-                  <circle class="hm-scan-pulse" r="36"/>
-                  <rect class="hm-scan-line" x="-32" y="-1" width="64" height="2"/>
-                  <path class="hm-scan-frame" d="M-32 -20V-32H-20M20 -32H32V-20M32 20V32H20M-20 32H-32V20"/>
+                <g class="hm-scan" id="hm-scan" transform="translate(660 240)">
+                  <rect class="hm-scan-area" x="-30" y="-30" width="60" height="60"/>
+                  <circle class="hm-scan-pulse" r="34"/>
+                  <rect class="hm-scan-line" x="-30" y="-1" width="60" height="2"/>
+                  <path class="hm-scan-frame" d="M-30 -18V-30H-18M18 -30H30V-18M30 18V30H18M-18 30H-30V18"/>
                 </g>
 
                 <!-- 조사 완료 표시 -->
-                <g class="hm-done" transform="translate(465 306)"><g class="hm-chip"><rect width="112" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">갈마동 314 완료</text></g></g>
-                <g class="hm-done" transform="translate(350 358)"><g class="hm-chip"><rect width="108" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">월평동 91 완료</text></g></g>
+                <g class="hm-done" transform="translate(604 256)"><g class="hm-chip"><rect width="112" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">갈마동 314 완료</text></g></g>
+                <g class="hm-done" transform="translate(538 316)"><g class="hm-chip"><rect width="108" height="22" rx="4"/><circle cx="11" cy="11" r="6.5"/><path d="M7.8 11.2l2.2 2.2 4.2-4.4"/><text x="22" y="11.5">월평동 91 완료</text></g></g>
 
                 <!-- 드론 -->
-                <g class="hm-drone-shadow" id="hm-drone-shadow" transform="translate(441 67)">
+                <g class="hm-drone-shadow" id="hm-drone-shadow" transform="translate(850 184)">
                   <path d="M-15 -15L15 15M15 -15L-15 15" stroke-width="5" stroke-linecap="round"/>
                   <circle cx="-15" cy="-15" r="8"/><circle cx="15" cy="-15" r="8"/><circle cx="-15" cy="15" r="8"/><circle cx="15" cy="15" r="8"/>
                   <rect x="-9" y="-11" width="18" height="22" rx="5"/>
                 </g>
-                <g class="hm-drone" id="hm-drone" transform="translate(431 53)">
+                <g class="hm-drone" id="hm-drone" transform="translate(840 170)">
                   <path class="hm-arm" d="M-15 -15L15 15M15 -15L-15 15"/>
                   <g transform="translate(-15 -15)"><circle class="hm-rotor" r="9"/><line class="hm-prop" x1="-7" x2="7"/></g>
                   <g transform="translate(15 -15)"><circle class="hm-rotor" r="9"/><line class="hm-prop" x1="-7" x2="7"/></g>
@@ -146,25 +139,25 @@
                   <circle class="hm-cam" cy="6" r="3"/>
                   <circle class="hm-led" cy="-6" r="1.8"/>
                 </g>
-
-                <!-- 축척과 방위 -->
-                <g class="hm-scale" transform="translate(24 490)"><path d="M0 0V6H100V0M50 3V6"/><text x="0" y="-5">0</text><text x="50" y="-5">50</text><text x="100" y="-5">100m</text></g>
-                <g class="hm-north" transform="translate(572 494)"><path d="M0-14L6 6L0 2L-6 6Z"/><text y="-18">N</text></g>
               </svg>
 
               <div class="gis-hud">
                 <p class="gis-hud-head"><span class="gis-rec" aria-hidden="true"></span>드론 현황조사<span class="gis-hud-meta">고도 120m</span></p>
                 <p class="gis-hud-status" id="hm-hud-status">이륙 준비</p>
               </div>
-              <div class="gis-zoom" aria-hidden="true"><span>+</span><span>−</span></div>
+              <div class="gis-zoom">
+                <button type="button" data-zoom="in" aria-pressed="true" aria-label="도심 확대해서 보기">+</button>
+                <button type="button" data-zoom="out" aria-pressed="false" aria-label="서구 전체 보기">−</button>
+              </div>
+              <div class="gis-north" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 8 16 26 10 21 4 26Z"/><text x="10" y="6">N</text></svg></div>
             </div>
           </div>
 
           <figcaption class="gis-status">
-            <span>축척 1:1,000</span>
+            <span id="gis-view">보기: 도심</span>
             <span>EPSG:5186</span>
             <span class="gis-coord">36.3554°N 127.3838°E</span>
-            <span class="gis-sample">예시 데이터</span>
+            <span class="gis-sample">필지 위치는 임의 예시</span>
           </figcaption>
         </figure>
       </div>
@@ -211,7 +204,7 @@
               <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></span>
               <h3>재산 조회</h3>
             </div>
-            <p>지번만 알면 그 땅이 국유인지 공유인지, 지금 누가 쓰고 있는지, 용도지역·지구가 무엇인지 바로 확인합니다.</p>
+            <p>지번만 알면 그 땅이 국유인지 시유·구유인지, 지금 누가 쓰고 있는지, 용도지역·지구가 무엇인지 바로 확인합니다.</p>
             <dl class="mini-facts">
               <div><dt>지번</dt><dd>갈마동 314</dd></div>
               <div><dt>지목</dt><dd>잡종지</dd></div>
@@ -304,7 +297,8 @@
               <span class="sample-badge">예시 데이터</span>
               <ul class="legend legend-sm">
                 <li><span class="swatch swatch-kuk"></span>국유</li>
-                <li><span class="swatch swatch-gong"></span>공유</li>
+                <li><span class="swatch swatch-si"></span>시유</li>
+                <li><span class="swatch swatch-gu"></span>구유</li>
                 <li><span class="swatch swatch-use"></span>활용 가능</li>
               </ul>
             </div>
@@ -410,9 +404,9 @@
             <h3>활용할 데이터</h3>
             <ul>
               <li>국유재산 공공데이터(공공데이터포털)</li>
-              <li>서구 공유재산 대장</li>
+              <li>대전광역시 시유재산, 서구 구유재산 대장</li>
               <li>토지이용계획 정보(용도지역·지구 등, 토지이음과 같은 국토교통부 자료를 공개 API로 연동)</li>
-              <li>연속지적도와 도로 정보(지적도·위치도 표시용)</li>
+              <li>행정동 경계, 연속지적도와 도로 정보(지도·지적도·위치도 표시용)</li>
               <li>항공사진(현황도 표시용)</li>
             </ul>
           </div>
@@ -439,7 +433,7 @@
       </div>
       <div class="footer-meta">
         <p><span class="footer-label">기획</span>서구청 토지정보과 윤혜림</p>
-        <p class="notice">AI 교육 실습용 기획안이며 현재 운영 중인 서비스가 아닙니다. 화면의 재산 정보는 예시입니다.</p>
+        <p class="notice">AI 교육 실습용 기획안이며 현재 운영 중인 서비스가 아닙니다. 화면의 재산 정보와 지도 위 필지 위치는 예시입니다.</p>
       </div>
     </div>
   </footer>

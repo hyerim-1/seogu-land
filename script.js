@@ -3,7 +3,7 @@
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-const OWNER_LABEL = { kuk: '국유', gong: '공유' };
+const OWNER_LABEL = { kuk: '국유', si: '시유', gu: '구유' };
 const STATUS_LABEL = { lease: '대부 중', permit: '사용허가 중', available: '활용 가능', unavailable: '대부 불가' };
 // 토지이음 토지이용계획 열람 페이지(새 창으로 열기)
 const EUM_LAND_PLAN_URL = 'https://www.eum.go.kr/web/ar/lu/luLandDet.jsp';
@@ -17,7 +17,7 @@ const DOCS = [
 const PARCELS = [
   {
     id: 'P1', jibun: '갈마동 312-7', jimok: '대', area: 180.4,
-    owner: 'gong', ownerName: '대전광역시 서구', status: 'lease',
+    owner: 'gu', ownerName: '대전광역시 서구', status: 'lease',
     statusDetail: '주거용으로 대부 중이며, 대부 기간은 2025년 3월부터 2030년 2월까지입니다.',
     docs: { apply: false, buy: true, giveup: true },
     hint: '이미 대부 중인 땅이라 새 사용(대부)허가 신청은 받지 않습니다. 현재 대부받은 분은 매수신청서나 포기서를 낼 수 있습니다.',
@@ -37,7 +37,7 @@ const PARCELS = [
   },
   {
     id: 'P3', jibun: '월평동 88-2', jimok: '공원', area: 1204.0,
-    owner: 'gong', ownerName: '대전광역시', status: 'permit',
+    owner: 'si', ownerName: '대전광역시', status: 'permit',
     statusDetail: '주민 텃밭으로 사용허가 중이며, 허가 기간은 2026년 12월까지입니다.',
     docs: { apply: false, buy: false, giveup: true },
     hint: '공원은 행정재산이라 매각 대상이 아닙니다. 현재 사용허가를 받은 분은 포기서를 낼 수 있습니다.',
@@ -57,7 +57,7 @@ const PARCELS = [
   },
   {
     id: 'P5', jibun: '도마동 45-3', jimok: '대', area: 610.5,
-    owner: 'gong', ownerName: '대전광역시 서구', status: 'unavailable',
+    owner: 'gu', ownerName: '대전광역시 서구', status: 'unavailable',
     statusDetail: '주택이 들어서 있어 사용(대부)허가나 매수를 신청할 수 없습니다.',
     docs: { apply: false, buy: false, giveup: false },
     hint: '건물이 있는 땅이라 지금은 대부나 매각 대상이 아닙니다.',
@@ -129,6 +129,11 @@ function renderMap() {
   const svg = document.getElementById('demo-map');
   if (!svg) return;
 
+  // 활용 가능 필지에 겹칠 빗금 무늬
+  const defs = svgEl('defs', {}, svg);
+  const hatch = svgEl('pattern', { id: 'demo-hatch', width: 8, height: 8, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
+  svgEl('rect', { width: 2.2, height: 8, fill: 'rgba(15, 34, 51, 0.55)' }, hatch);
+
   drawRoads(svg, 'road', true);
   PRIVATE_LOTS.forEach((pts) => svgEl('polygon', { class: 'lot-private', points: toPoints(pts) }, svg));
 
@@ -147,10 +152,10 @@ function renderMap() {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectParcel(p.id); }
     });
 
+    if (p.status === 'available') svgEl('polygon', { class: 'parcel-hatch', points: toPoints(p.points), fill: 'url(#demo-hatch)' }, svg);
     const [cx, cy] = centroid(p.points);
-    const label = svgEl('text', { class: 'parcel-no', x: cx, y: cy + (p.status === 'available' ? 20 : 4) }, svg);
+    const label = svgEl('text', { class: 'parcel-no', x: cx, y: cy + 4 }, svg);
     label.textContent = lotNumber(p.jibun);
-    if (p.status === 'available') svgEl('circle', { class: 'parcel-dot', cx, cy: cy - 4, r: 6 }, svg);
   });
 }
 
@@ -459,33 +464,100 @@ function initTabs() {
   });
 }
 
-// ---------- 첫 화면: 공간정보 지도 ----------
-// [x, y, 너비, 높이, 구분] 구분 없음: 일반 필지(건물 표시), kuk 국유, gong 공유, use 활용 가능, office 서구청
-const HERO_PARCELS = [
-  [144, 4, 52, 52], [196, 4, 53, 52, 'kuk'], [144, 56, 52, 53], [196, 56, 53, 53],
-  [144, 121, 52, 55], [196, 121, 53, 55], [144, 176, 52, 55], [196, 176, 53, 55],
-  [144, 249, 52, 52], [196, 249, 53, 52], [144, 301, 52, 53, 'gong'], [196, 301, 53, 53],
-  [261, 4, 34, 105], [295, 4, 34, 105, 'gong'], [329, 4, 33, 105],
-  [261, 121, 51, 55, 'kuk'], [312, 121, 50, 55], [261, 176, 51, 55], [312, 176, 50, 55],
-  [261, 249, 34, 105], [295, 249, 34, 105], [329, 249, 33, 105],
-  [261, 366, 51, 60, 'gong'], [312, 366, 50, 60],
-  [378, 4, 106, 105, 'office'],
-  [378, 121, 53, 37], [431, 121, 53, 37], [378, 158, 53, 37], [431, 158, 53, 37, 'gong'], [378, 195, 53, 36], [431, 195, 53, 36],
-  [378, 249, 53, 52], [431, 249, 53, 52, 'kuk'], [378, 301, 53, 53, 'use'], [431, 301, 53, 53],
-  [378, 366, 53, 60], [431, 366, 53, 60],
-  [496, 4, 50, 52], [546, 4, 50, 52], [496, 56, 50, 53], [546, 56, 50, 53, 'gong'],
-  [496, 121, 50, 110], [546, 121, 50, 110, 'kuk'],
-  [496, 249, 50, 52, 'use'], [546, 249, 50, 52], [496, 301, 50, 53], [546, 301, 50, 53],
-  [496, 366, 100, 60],
-];
+// ---------- 첫 화면: 대전 서구 행정동 지도 ----------
+const DONG_MAP_URL = 'images/seogu-dong-map.svg';
+const HERO_VIEWS = { in: [470, -60, 490, 620], out: [-120, -30, 1200, 1846] };
+const HERO_VIEW_LABEL = { in: '보기: 도심', out: '보기: 서구 전체' };
 
-function renderHeroMap() {
-  const layer = document.getElementById('hm-parcels');
-  if (!layer) return;
-  HERO_PARCELS.forEach(([x, y, w, h, kind]) => {
-    svgEl('rect', { class: `hm-parcel${kind ? ` hm-${kind}` : ''}`, x, y, width: w, height: h }, layer);
-    if (!kind) svgEl('rect', { class: 'hm-building', x: x + w * 0.2, y: y + h * 0.22, width: w * 0.6, height: h * 0.52 }, layer);
+// 새로고침해도 같은 자리에 표시되도록 고정 시드 난수 사용
+function seededRandom(seed) {
+  let s = seed;
+  return () => {
+    s = (s + 0x6d2b79f5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// type: kuk 국유, si 시유, gu 구유 / usable: 활용 가능이면 빗금을 겹침
+function addHeroLot(layer, x, y, type, usable, angle) {
+  const g = svgEl('g', { class: `hm-lot hm-lot-${type}`, transform: `translate(${x} ${y}) rotate(${angle})` }, layer);
+  svgEl('rect', { class: 'hm-lot-body', x: -9, y: -7, width: 18, height: 14, rx: 1.5 }, g);
+  if (usable) svgEl('rect', { class: 'hm-hatch', x: -9, y: -7, width: 18, height: 14, rx: 1.5, fill: 'url(#hm-hatch)' }, g);
+}
+
+// 행정동마다 면적에 맞춰 국·시·구유지 표시를 임의 위치에 뿌림
+function scatterHeroLots(dongs, layer) {
+  const rand = seededRandom(3804);
+  const taken = SURVEY_SPOTS.map((s) => [s.x, s.y]);
+  SURVEY_SPOTS.forEach((s) => addHeroLot(layer, s.x, s.y, 'kuk', true, 0));
+  const inside = (path, x, y) => [[-11, -9], [11, -9], [-11, 9], [11, 9]]
+    .every(([dx, dy]) => path.isPointInFill(new DOMPoint(x + dx, y + dy)));
+
+  dongs.forEach((path) => {
+    const box = path.getBBox();
+    const count = Math.max(2, Math.min(6, Math.round((box.width * box.height) / 9000)));
+    let placed = 0;
+    for (let tries = 0; placed < count && tries < count * 60; tries += 1) {
+      const x = box.x + rand() * box.width;
+      const y = box.y + rand() * box.height;
+      if (!inside(path, x, y) || taken.some(([tx, ty]) => Math.hypot(tx - x, ty - y) < 30)) continue;
+      const r = rand();
+      addHeroLot(layer, x, y, r < 0.3 ? 'kuk' : r < 0.62 ? 'si' : 'gu', rand() < 0.18, Math.round((rand() - 0.5) * 50));
+      taken.push([x, y]);
+      placed += 1;
+    }
   });
+}
+
+async function renderHeroMap() {
+  const dongLayer = document.getElementById('hm-dongs');
+  const lotLayer = document.getElementById('hm-parcels');
+  const labelLayer = document.getElementById('hm-labels');
+  if (!dongLayer) return;
+  try {
+    const res = await fetch(DONG_MAP_URL);
+    if (!res.ok) return;
+    const doc = new DOMParser().parseFromString(await res.text(), 'image/svg+xml');
+    [['#dong', dongLayer], ['#outline', dongLayer], ['#dong-labels', labelLayer], ['#neighbor-labels', labelLayer]]
+      .forEach(([sel, target]) => {
+        const node = doc.querySelector(sel);
+        if (node) target.appendChild(document.importNode(node, true));
+      });
+  } catch (e) {
+    return;
+  }
+  const dongs = [...dongLayer.querySelectorAll('.dong')];
+  if (dongs.length && typeof dongs[0].isPointInFill === 'function') scatterHeroLots(dongs, lotLayer);
+}
+
+// 확대(도심) / 축소(서구 전체) 버튼
+function initZoom() {
+  const svg = document.getElementById('hero-svg');
+  const label = document.getElementById('gis-view');
+  const buttons = [...document.querySelectorAll('.gis-zoom [data-zoom]')];
+  if (!svg || !buttons.length) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let rafId = 0;
+
+  const setView = (key) => {
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.zoom === key)));
+    if (label) label.textContent = HERO_VIEW_LABEL[key];
+    const from = svg.getAttribute('viewBox').split(' ').map(Number);
+    const to = HERO_VIEWS[key];
+    cancelAnimationFrame(rafId);
+    if (reduce) { svg.setAttribute('viewBox', to.join(' ')); return; }
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min((now - start) / 450, 1);
+      const k = 1 - (1 - p) ** 3;
+      svg.setAttribute('viewBox', from.map((v, i) => v + (to[i] - v) * k).join(' '));
+      if (p < 1) rafId = requestAnimationFrame(step);
+    };
+    rafId = requestAnimationFrame(step);
+  };
+  buttons.forEach((b) => b.addEventListener('click', () => setView(b.dataset.zoom)));
 }
 
 // 레이어 패널: 체크를 끄면 해당 레이어를 지도에서 숨김
@@ -498,10 +570,10 @@ function initLayers() {
 }
 
 // ---------- 첫 화면: 드론 필지 순회 조사 ----------
-const DRONE_HOME = { x: 431, y: 53 }; // 서구청 옥상
+const DRONE_HOME = { x: 840, y: 170 }; // 서구청
 const SURVEY_SPOTS = [
-  { x: 521, y: 275, name: '갈마동 314' },
-  { x: 404.5, y: 327.5, name: '월평동 91' },
+  { x: 660, y: 240, name: '갈마동 314' },
+  { x: 592, y: 300, name: '월평동 91' },
 ];
 
 // 이륙 → 필지마다 이동·촬영 → 복귀를 한 바퀴로 반복
@@ -583,6 +655,7 @@ function initDrone() {
 
 renderHeroMap();
 initLayers();
+initZoom();
 renderMap();
 selectParcel('P2');
 initTabs();
