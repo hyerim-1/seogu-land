@@ -459,11 +459,49 @@ function initTabs() {
   });
 }
 
+// ---------- 첫 화면: 공간정보 지도 ----------
+// [x, y, 너비, 높이, 구분] 구분 없음: 일반 필지(건물 표시), kuk 국유, gong 공유, use 활용 가능, office 서구청
+const HERO_PARCELS = [
+  [144, 4, 52, 52], [196, 4, 53, 52, 'kuk'], [144, 56, 52, 53], [196, 56, 53, 53],
+  [144, 121, 52, 55], [196, 121, 53, 55], [144, 176, 52, 55], [196, 176, 53, 55],
+  [144, 249, 52, 52], [196, 249, 53, 52], [144, 301, 52, 53, 'gong'], [196, 301, 53, 53],
+  [261, 4, 34, 105], [295, 4, 34, 105, 'gong'], [329, 4, 33, 105],
+  [261, 121, 51, 55, 'kuk'], [312, 121, 50, 55], [261, 176, 51, 55], [312, 176, 50, 55],
+  [261, 249, 34, 105], [295, 249, 34, 105], [329, 249, 33, 105],
+  [261, 366, 51, 60, 'gong'], [312, 366, 50, 60],
+  [378, 4, 106, 105, 'office'],
+  [378, 121, 53, 37], [431, 121, 53, 37], [378, 158, 53, 37], [431, 158, 53, 37, 'gong'], [378, 195, 53, 36], [431, 195, 53, 36],
+  [378, 249, 53, 52], [431, 249, 53, 52, 'kuk'], [378, 301, 53, 53, 'use'], [431, 301, 53, 53],
+  [378, 366, 53, 60], [431, 366, 53, 60],
+  [496, 4, 50, 52], [546, 4, 50, 52], [496, 56, 50, 53], [546, 56, 50, 53, 'gong'],
+  [496, 121, 50, 110], [546, 121, 50, 110, 'kuk'],
+  [496, 249, 50, 52, 'use'], [546, 249, 50, 52], [496, 301, 50, 53], [546, 301, 50, 53],
+  [496, 366, 100, 60],
+];
+
+function renderHeroMap() {
+  const layer = document.getElementById('hm-parcels');
+  if (!layer) return;
+  HERO_PARCELS.forEach(([x, y, w, h, kind]) => {
+    svgEl('rect', { class: `hm-parcel${kind ? ` hm-${kind}` : ''}`, x, y, width: w, height: h }, layer);
+    if (!kind) svgEl('rect', { class: 'hm-building', x: x + w * 0.2, y: y + h * 0.22, width: w * 0.6, height: h * 0.52 }, layer);
+  });
+}
+
+// 레이어 패널: 체크를 끄면 해당 레이어를 지도에서 숨김
+function initLayers() {
+  const svg = document.getElementById('hero-svg');
+  if (!svg) return;
+  document.querySelectorAll('.gis-layers input[data-layer]').forEach((input) => {
+    input.addEventListener('change', () => svg.classList.toggle(`hide-${input.dataset.layer}`, !input.checked));
+  });
+}
+
 // ---------- 첫 화면: 드론 필지 순회 조사 ----------
-const DRONE_HOME = { x: 431, y: 62 }; // 서구청 옥상
+const DRONE_HOME = { x: 431, y: 53 }; // 서구청 옥상
 const SURVEY_SPOTS = [
-  { x: 545, y: 292, name: '갈마동 314' },
-  { x: 417, y: 327, name: '월평동 91' },
+  { x: 521, y: 275, name: '갈마동 314' },
+  { x: 404.5, y: 327.5, name: '월평동 91' },
 ];
 
 // 이륙 → 필지마다 이동·촬영 → 복귀를 한 바퀴로 반복
@@ -543,6 +581,8 @@ function initDrone() {
   play();
 }
 
+renderHeroMap();
+initLayers();
 renderMap();
 selectParcel('P2');
 initTabs();
