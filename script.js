@@ -5,6 +5,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const OWNER_LABEL = { kuk: '국유', gong: '공유' };
 const STATUS_LABEL = { lease: '대부 중', permit: '사용허가 중', available: '활용 가능' };
+// 토지이음 토지이용계획 열람 페이지(새 창으로 열기)
+const EUM_LAND_PLAN_URL = 'https://www.eum.go.kr/web/ar/lu/luLandDet.jsp';
 const DOCS = [
   { key: 'apply', name: '사용(대부)허가 신청서' },
   { key: 'buy', name: '매수신청서' },
@@ -19,6 +21,7 @@ const PARCELS = [
     statusDetail: '주거용으로 대부 중이며, 대부 기간은 2025년 3월부터 2030년 2월까지입니다.',
     docs: { apply: false, buy: true, giveup: true },
     hint: '이미 대부 중인 땅이라 새 사용(대부)허가 신청은 받지 않습니다. 현재 대부받은 분은 매수신청서나 포기서를 낼 수 있습니다.',
+    zoning: { area: '제2종일반주거지역', district: '없음', zone: '가축사육제한구역' },
     use: 'house', useText: '단독주택 1동과 마당이 있습니다.',
     points: [[96, 12], [190, 12], [186, 76], [90, 80]],
   },
@@ -28,6 +31,7 @@ const PARCELS = [
     statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
     docs: { apply: true, buy: true, giveup: false },
     hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
+    zoning: { area: '제2종일반주거지역', district: '없음', zone: '가축사육제한구역' },
     use: 'bare', useText: '건물 없이 비어 있는 땅입니다.',
     points: [[90, 80], [244, 74], [244, 164], [84, 164]],
   },
@@ -37,6 +41,7 @@ const PARCELS = [
     statusDetail: '주민 텃밭으로 사용허가 중이며, 허가 기간은 2026년 12월까지입니다.',
     docs: { apply: false, buy: false, giveup: true },
     hint: '공원은 행정재산이라 매각 대상이 아닙니다. 현재 사용허가를 받은 분은 포기서를 낼 수 있습니다.',
+    zoning: { area: '자연녹지지역', district: '없음', zone: '도시·군계획시설(근린공원)' },
     use: 'garden', useText: '주민 텃밭으로 가꾸고 있습니다.',
     points: [[372, 12], [468, 12], [468, 88], [372, 92]],
   },
@@ -46,6 +51,7 @@ const PARCELS = [
     statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
     docs: { apply: true, buy: true, giveup: false },
     hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
+    zoning: { area: '자연녹지지역', district: '없음', zone: '개발제한구역' },
     use: 'field', useText: '밭고랑만 남아 있고 경작하지 않고 있습니다.',
     points: [[372, 92], [468, 88], [468, 164], [380, 164]],
   },
@@ -55,6 +61,7 @@ const PARCELS = [
     statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
     docs: { apply: true, buy: true, giveup: false },
     hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
+    zoning: { area: '생산녹지지역', district: '없음', zone: '가축사육제한구역' },
     use: 'paddy', useText: '논이었던 땅으로, 지금은 벼를 심지 않고 있습니다.',
     points: [[12, 200], [128, 200], [120, 290], [12, 296]],
   },
@@ -64,6 +71,7 @@ const PARCELS = [
     statusDetail: '공영주차장으로 사용허가 중이며, 허가 기간은 2027년 6월까지입니다.',
     docs: { apply: false, buy: false, giveup: true },
     hint: '행정재산으로 쓰이고 있어 매각 대상이 아닙니다. 현재 사용허가를 받은 분은 포기서를 낼 수 있습니다.',
+    zoning: { area: '일반상업지역', district: '방화지구', zone: '도시·군계획시설(주차장)' },
     use: 'parking', useText: '공영주차장으로 쓰고 있습니다.',
     points: [[360, 200], [468, 200], [468, 348], [352, 348], [356, 270]],
   },
@@ -175,6 +183,23 @@ function renderCard(parcel) {
       <div class="wide"><dt>소유자</dt><dd>${OWNER_LABEL[parcel.owner]}(${parcel.ownerName})</dd></div>
       <div class="wide"><dt>사용·대부 현황</dt><dd>${parcel.statusDetail}</dd></div>
     </dl>
+    <section class="zoning" aria-label="토지이용계획">
+      <div class="zoning-head">
+        <p class="zoning-title">토지이용계획</p>
+        <span class="zoning-badge">예시</span>
+      </div>
+      <dl class="zoning-list">
+        <div><dt>용도지역</dt><dd>${parcel.zoning.area}</dd></div>
+        <div><dt>용도지구</dt><dd>${parcel.zoning.district}</dd></div>
+        <div><dt>용도구역·기타</dt><dd>${parcel.zoning.zone}</dd></div>
+      </dl>
+      <a class="eum-link" href="${EUM_LAND_PLAN_URL}" target="_blank" rel="noopener noreferrer">
+        토지이음에서 토지이용계획 열람
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2 7 9"/></svg>
+        <span class="sr-only">(새 창)</span>
+      </a>
+      <p class="zoning-hint">실제 서비스에서는 필지를 고르면 토지이음과 같은 국토교통부 토지이용계획 정보를 공개 API로 자동으로 불러옵니다.</p>
+    </section>
     <div class="drawing">
       <div class="drawing-head">
         <span class="drawing-title">도면 보기</span>

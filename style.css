@@ -252,6 +252,7 @@ h3 { font-size: 1.1875rem; line-height: 1.4; letter-spacing: -0.01em; }
 .mini-facts, .mini-docs, .mini-list, .mini-drawings { margin-top: 22px; }
 .mini-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; }
 .mini-facts div:first-child { grid-column: span 2; }
+.mini-facts div:last-child { grid-column: 1 / -1; }
 .mini-facts div { background: var(--paper); padding: 8px 12px; }
 .mini-facts dt { font-size: 0.8125rem; color: var(--ink-soft); }
 .mini-facts dd { margin: 0; font-weight: 700; font-size: 0.9375rem; }
@@ -329,6 +330,23 @@ h3 { font-size: 1.1875rem; line-height: 1.4; letter-spacing: -0.01em; }
 .card-facts .wide { grid-column: 1 / -1; }
 .card-facts dt { font-size: 0.8125rem; color: var(--ink-soft); }
 .card-facts dd { margin: 2px 0 0; font-weight: 500; }
+
+.zoning { margin-top: 18px; padding: 14px 16px; background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--gong); border-radius: 8px; }
+.zoning-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.zoning-title { font-weight: 700; font-size: 0.9375rem; }
+.zoning-badge { font-size: 0.75rem; font-weight: 700; color: var(--use-text); background: var(--use-tint); padding: 1px 8px; border-radius: 4px; }
+.zoning-list { margin: 0; display: grid; gap: 6px; }
+.zoning-list div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 8px; font-size: 0.9375rem; line-height: 1.5; }
+.zoning-list dt { color: var(--ink-soft); }
+.zoning-list dd { margin: 0; font-weight: 500; }
+.eum-link {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; min-height: 40px; padding: 0 14px;
+  border: 1.5px solid var(--gong); border-radius: 8px; color: var(--gong); font-weight: 700; font-size: 0.875rem; text-decoration: none;
+}
+.eum-link:hover { background: var(--gong); color: #fff; }
+.eum-link svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.zoning-hint { margin-top: 8px; font-size: 0.8125rem; color: var(--ink-soft); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .drawing { margin-top: 18px; }
 .drawing-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 8px; }
