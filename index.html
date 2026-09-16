@@ -45,6 +45,7 @@
         <a href="#features">핵심 기능</a>
         <a href="#flow">이용 흐름</a>
         <a href="#roadmap">개발 계획</a>
+        <a href="architecture.html">시스템 구조</a>
         <a class="btn btn-primary btn-sm" href="#demo">화면 미리보기</a>
       </nav>
     </div>
@@ -92,7 +93,7 @@
 
             <div class="gis-map">
               <svg class="gis-svg" id="hero-svg" viewBox="470 -60 490 620" role="img" aria-labelledby="hero-map-title">
-                <title id="hero-map-title">대전 서구 행정동 지도. 국유지는 초록, 시유지는 노랑, 구유지는 파랑으로 임의 위치에 표시되어 있고, 빌리거나 살 수 있는 땅은 빗금으로 구분됩니다. 드론이 서구청에서 출발해 만년동, 월평1동, 탄방동의 활용 가능한 필지를 차례로 촬영 조사합니다.</title>
+                <title id="hero-map-title">대전 서구 행정동 지도. 시유지는 노랑, 구유지는 파랑으로 표시되며, 표시 개수는 대전광역시 재산정보 공개시스템의 2026년 4월 기준 실제 건수를 50건당 하나로 줄인 것입니다. 국유지(초록)는 아직 연계 전이라 예시 세 곳만 있습니다. 빗금은 그 동에 지금 빌리거나 살 수 있는 시유재산이 있다는 뜻입니다. 드론이 서구청에서 출발해 만년동, 월평1동, 탄방동을 차례로 촬영 조사합니다.</title>
                 <defs>
                   <pattern id="hm-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.6" height="5" fill="rgba(15, 34, 51, 0.7)"/></pattern>
 
@@ -189,10 +190,14 @@
 
           <figcaption class="gis-status">
             <span id="gis-view">보기: 도심</span>
-            <span>EPSG:5186</span>
+            <span id="gis-total">시유·구유 건수 불러오는 중</span>
             <span class="gis-coord">36.3554°N 127.3838°E</span>
-            <span class="gis-sample">필지 위치는 임의 예시</span>
+            <span class="gis-sample">표시 1개 ≈ 50건 · 위치는 예시</span>
           </figcaption>
+          <p class="gis-source">
+            시유·구유 건수는 <a href="https://www.daejeon.go.kr/jaesan/PropertyList.do" target="_blank" rel="noopener">대전광역시 재산정보 공개시스템</a>의 2026년 4월 기준 실제 자료입니다.
+            국유는 <a href="https://www.k-pis.go.kr/addMapView.do" target="_blank" rel="noopener">e나라재산 국유재산포털</a> 연계 전이라 예시로 표시했습니다.
+          </p>
         </figure>
       </div>
     </section>
@@ -454,6 +459,11 @@
             </ul>
           </div>
         </div>
+
+        <p class="plan-more">
+          <a class="btn btn-outline" href="architecture.html">시스템 구조도 자세히 보기</a>
+          <span>어느 시스템에서 무엇을 받아오는지 한 장으로 정리했습니다.</span>
+        </p>
       </div>
     </section>
   </main>
@@ -467,7 +477,7 @@
       </div>
       <div class="footer-meta">
         <p><span class="footer-label">기획</span>서구청 토지정보과 윤혜림</p>
-        <p class="notice">AI 교육 실습용 기획안이며 현재 운영 중인 서비스가 아닙니다. 화면의 재산 정보와 지도 위 필지 위치는 예시입니다.</p>
+        <p class="notice">AI 교육 실습용 기획안이며 현재 운영 중인 서비스가 아닙니다. 첫 화면 지도의 시유·구유 건수는 대전광역시 재산정보 공개시스템의 2026년 4월 기준 실제 자료이고, 필지 위치와 국유 표시, 화면 미리보기의 재산 정보는 예시입니다.</p>
       </div>
     </div>
   </footer>

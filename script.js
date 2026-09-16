@@ -484,6 +484,43 @@ function seededRandom(seed) {
   };
 }
 
+// 실제 재산 건수: 대전광역시 재산정보 공개시스템(2026년 4월 기준) 집계를 data/에 담아 둠
+const JAESAN_URL = 'data/seogu-jaesan.json';
+
+// 법정동을 지도의 행정동에 맞춘 표. 지도 표시를 위한 근사이며, 건수는 해당 행정동에 나누어 뿌림
+const DONG_TO_HAENG = {
+  가수원동: ['가수원동'], 가장동: ['가장동'], 갈마동: ['갈마1동', '갈마2동'],
+  관저동: ['관저1동', '관저2동'], 괴정동: ['괴정동'], 내동: ['내동'],
+  도마동: ['도마1동', '도마2동'], 도안동: ['가수원동'], 만년동: ['만년동'],
+  둔산동: ['둔산1동', '둔산2동', '둔산3동'], 변동: ['변동'], 복수동: ['복수동'],
+  용문동: ['용문동'], 월평동: ['월평1동', '월평2동', '월평3동'],
+  정림동: ['정림동'], 탄방동: ['탄방동'],
+  // 행정동 기성동이 관할하는 서구 남부 법정동
+  괴곡동: ['기성동'], 매노동: ['기성동'], 봉곡동: ['기성동'], 산직동: ['기성동'],
+  오동: ['기성동'], 용촌동: ['기성동'], 우명동: ['기성동'], 원정동: ['기성동'],
+  장안동: ['기성동'], 평촌동: ['기성동'], 흑석동: ['기성동'],
+};
+
+// 표시 하나가 나타내는 재산 건수
+const LOTS_PER_MARK = 50;
+const markCount = (n) => (n > 0 ? Math.min(6, Math.max(1, Math.round(n / LOTS_PER_MARK))) : 0);
+
+// 법정동별 건수를 지도의 행정동별로 합침
+function foldByHaeng(rows) {
+  const out = {};
+  rows.forEach((row) => {
+    const targets = DONG_TO_HAENG[row.법정동];
+    if (!targets) return;
+    targets.forEach((name) => {
+      const acc = (out[name] = out[name] || { si: 0, gu: 0, free: 0 });
+      acc.si += row.시유 / targets.length;
+      acc.gu += row.구유 / targets.length;
+      acc.free += row.시유_활용가능 / targets.length;
+    });
+  });
+  return out;
+}
+
 // type: kuk 국유, si 시유, gu 구유 / usable: 활용 가능이면 빗금을 겹침
 function addHeroLot(layer, x, y, type, usable, angle) {
   const g = svgEl('g', { class: `hm-lot hm-lot-${type}`, transform: `translate(${x} ${y}) rotate(${angle})` }, layer);
@@ -491,24 +528,36 @@ function addHeroLot(layer, x, y, type, usable, angle) {
   if (usable) svgEl('rect', { class: 'hm-hatch', x: -9, y: -7, width: 18, height: 14, rx: 1.5, fill: 'url(#hm-hatch)' }, g);
 }
 
-// 행정동마다 면적에 맞춰 국·시·구유지 표시를 임의 위치에 뿌림
-function scatterHeroLots(dongs, layer) {
+// 행정동마다 실제 재산 건수만큼 시유·구유 표시를 뿌림(위치는 예시)
+function scatterHeroLots(dongs, layer, byHaeng) {
   const rand = seededRandom(3804);
   const taken = SURVEY_SPOTS.map((s) => [s.x, s.y]);
+  // 국유(초록)는 아직 연계 전이라, 드론이 조사하는 세 곳만 예시로 표시
   SURVEY_SPOTS.forEach((s) => addHeroLot(layer, s.x, s.y, 'kuk', true, 0));
   const inside = (path, x, y) => [[-11, -9], [11, -9], [-11, 9], [11, 9]]
     .every(([dx, dy]) => path.isPointInFill(new DOMPoint(x + dx, y + dy)));
 
   dongs.forEach((path) => {
+    const stat = byHaeng[path.id];
+    if (!stat) return;
+
+    // 구유 → 시유 순서로 표시 개수를 정함.
+    // 빗금은 "이 동에 지금 빌리거나 살 수 있는 시유재산이 있다"는 뜻이라 동마다 하나만 겹침
+    // (서구 전체 2,415건 중 미대부는 55건뿐이라, 건수에 비례시키면 오히려 부풀려 보인다)
+    const plan = [];
+    for (let i = 0; i < markCount(stat.gu); i += 1) plan.push(['gu', false]);
+    const siMarks = markCount(stat.si);
+    const freeMarks = stat.free >= 1 ? 1 : 0;
+    for (let i = 0; i < siMarks; i += 1) plan.push(['si', i < freeMarks]);
+
     const box = path.getBBox();
-    const count = Math.max(2, Math.min(6, Math.round((box.width * box.height) / 9000)));
     let placed = 0;
-    for (let tries = 0; placed < count && tries < count * 60; tries += 1) {
+    for (let tries = 0; placed < plan.length && tries < plan.length * 60; tries += 1) {
       const x = box.x + rand() * box.width;
       const y = box.y + rand() * box.height;
       if (!inside(path, x, y) || taken.some(([tx, ty]) => Math.hypot(tx - x, ty - y) < 30)) continue;
-      const r = rand();
-      addHeroLot(layer, x, y, r < 0.3 ? 'kuk' : r < 0.62 ? 'si' : 'gu', rand() < 0.18, Math.round((rand() - 0.5) * 50));
+      const [type, usable] = plan[placed];
+      addHeroLot(layer, x, y, type, usable, Math.round((rand() - 0.5) * 50));
       taken.push([x, y]);
       placed += 1;
     }
@@ -546,7 +595,26 @@ async function renderHeroMap() {
     });
   }
 
-  if (dongs.length && typeof dongs[0].isPointInFill === 'function') scatterHeroLots(dongs, lotLayer);
+  if (!dongs.length || typeof dongs[0].isPointInFill !== 'function') return;
+
+  // 실제 건수를 읽어 뿌림. 파일을 못 읽으면 지도는 경계만 그대로 둔다.
+  try {
+    const res = await fetch(JAESAN_URL);
+    if (!res.ok) return;
+    const data = await res.json();
+    scatterHeroLots(dongs, lotLayer, foldByHaeng(data.법정동별));
+    showJaesanTotals(data);
+  } catch (e) {
+    /* 파일을 못 읽으면 표시를 생략한다 */
+  }
+}
+
+// 지도 아래 상태줄에 실제 합계를 적음
+function showJaesanTotals(data) {
+  const el = document.getElementById('gis-total');
+  if (!el) return;
+  const n = (v) => v.toLocaleString('ko-KR');
+  el.textContent = `시유 ${n(data.합계.시유)} · 구유 ${n(data.합계.구유)}건`;
 }
 
 // 움직임 줄이기 설정이면 수채화 색 변화와 번짐 효과를 멈추고 완성된 모습만 보여줌

@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>이 서비스는 이렇게 만들어집니다 | 우리동네 국·공유재산 기획안</title>
+  <meta name="description" content="대전 서구 국·공유재산 조회·신청 서비스의 시스템 구조도와 데이터 연계 계획">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:site_name" content="우리동네 국·공유재산">
+  <meta property="og:title" content="이 서비스는 이렇게 만들어집니다">
+  <meta property="og:description" content="어느 시스템에서 무엇을 받아와 어떻게 처리하는지, 시스템 구조도로 정리했습니다.">
+  <meta property="og:url" content="https://seogu-land.vercel.app/architecture">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2312365A'/%3E%3Cpath d='M6 7h11l-1 9H6zM17 7h9v10h-10zM6 16h10l1 9H6zM16 17h10v8h-9z' fill='none' stroke='%23FFFFFF' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="6"/>
+          <path d="M6 7h11l-1 9H6zM17 7h9v10h-10zM6 16h10l1 9H6zM16 17h10v8h-9z"/>
+        </svg>
+        <span class="brand-text">
+          <strong>우리동네 국·공유재산</strong>
+          <small>대전 서구 재산 조회·신청 서비스 기획안</small>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="섹션 이동">
+        <a href="#intent">기획의도</a>
+        <a href="#arch">시스템 구조</a>
+        <a href="#sources">외부 데이터</a>
+        <a class="btn btn-primary btn-sm" href="index.html#demo">화면 미리보기</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- 머리말 -->
+    <section class="plan-head">
+      <div class="wrap">
+        <p class="plan-badge">기획안</p>
+        <h1>이 서비스는 이렇게 만들어집니다</h1>
+        <p class="lede">
+          랜딩 페이지가 <strong>무엇을 만들 것인가</strong>를 보여준다면, 이 쪽은 그 다음 질문에 답합니다.
+          어느 시스템에서 무엇을 받아와, 어떻게 처리해서, 주민과 담당자에게 무엇을 돌려주는가.
+        </p>
+        <figure class="plan-logo">
+          <img src="images/seogu-logo.jpg" width="393" height="76"
+               alt="대전 서구 브랜드 이미지. SEOGU 글자 안에 나무와 주민, 집이 그려진 일러스트">
+          <figcaption>대전광역시 서구</figcaption>
+        </figure>
+      </div>
+    </section>
+
+
+    <!-- 기획의도 -->
+    <section class="section intent" id="intent" aria-labelledby="intent-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="intent-title">왜 이걸 만드나</h2>
+          <p>주민의 민원을 줄이는 것과, 행정이 판단할 근거를 갖는 것. 두 가지를 같이 노립니다.</p>
+        </div>
+
+        <div class="intent-grid">
+          <article class="intent-card">
+            <p class="intent-tag">하나</p>
+            <h3>민원 — 한 곳에서 끝내기</h3>
+            <p>
+              지금 주민이 국·공유지 하나를 알아보려면 국유재산포털, 대전광역시 재산정보 공개시스템,
+              서구 사전정보공개 게시판, 토지이음을 차례로 돌아야 합니다.
+              그러고도 신청은 구청을 직접 찾아와야 합니다.
+            </p>
+            <ul class="intent-list">
+              <li>흩어진 재산 정보를 <strong>필지 하나 화면</strong>으로 합쳐서 보여줌</li>
+              <li>사용(대부)허가 신청서, 매수신청서, 포기서를 <strong>온라인으로 제출</strong></li>
+              <li>접수·검토·허가 결과를 문자와 화면으로 <strong>되돌려 알림</strong></li>
+            </ul>
+          </article>
+
+          <article class="intent-card intent-card-main">
+            <p class="intent-tag">둘</p>
+            <h3>정책지원 — 재산 현황을 한눈에</h3>
+            <p>
+              민원 응대보다 오래가는 쓸모는 이쪽입니다.
+              지금은 「우리 구에 국·공유재산이 어디에 얼마나 있는가」를 보려면 대장을 엑셀로 내려받아
+              직접 세어야 합니다. <strong>지도 위에 소유 구분대로 칠해 두면, 세지 않고 봅니다.</strong>
+            </p>
+            <ul class="intent-list">
+              <li><strong>유휴재산 찾기</strong> — 지금 아무도 안 쓰는 땅이 어느 동에 몰려 있는지</li>
+              <li><strong>활용 계획 세우기</strong> — 주차장, 텃밭, 쉼터로 돌릴 후보지를 지도에서 고름</li>
+              <li><strong>세입 근거</strong> — 대부 가능한 재산이 얼마나 남았는지로 대부료 세입을 가늠</li>
+              <li><strong>편중 확인</strong> — 재산이 특정 동에 쏠려 있는지, 개발지에 묶여 있는지</li>
+              <li><strong>부서 간 조율</strong> — 재산관리관이 어느 부서인지가 같이 보여 협의가 빨라짐</li>
+            </ul>
+
+            <div class="intent-proof">
+              <p class="intent-proof-head">이번에 실제 자료를 붙여 보니 바로 드러난 것</p>
+              <dl class="intent-figures">
+                <div><dt>도마동 구유</dt><dd>446건</dd></div>
+                <div><dt>둔산동 구유</dt><dd>32건</dd></div>
+                <div><dt>월평동 시유</dt><dd>263건</dd></div>
+                <div><dt>지금 빌릴 수 있는 시유</dt><dd>55건</dd></div>
+              </dl>
+              <p class="intent-proof-note">
+                도심은 시유, 외곽은 구유로 확연히 갈립니다.
+                표로 6,015줄을 보면 안 보이던 것이, 지도에 색으로 올리니 한 번에 보입니다.
+                첫 화면 지도가 바로 그 화면입니다.
+              </p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 시스템 구조도 -->
+    <section class="section arch" id="arch" aria-labelledby="arch-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="arch-title">시스템 구조도</h2>
+          <p>데이터가 왼쪽에서 오른쪽으로 흘러갔다가, 처리 결과가 되돌아옵니다.</p>
+        </div>
+
+        <ol class="flowmap">
+          <li class="fm-col">
+            <p class="fm-step">1</p>
+            <h3>이용자</h3>
+            <ul class="fm-list">
+              <li>주민·민원인</li>
+              <li>구청 담당 공무원</li>
+            </ul>
+            <p class="fm-note">지번이나 동 이름으로 찾기 시작합니다.</p>
+          </li>
+
+          <li class="fm-col">
+            <p class="fm-step">2</p>
+            <h3>화면</h3>
+            <ul class="fm-list">
+              <li>재산 조회</li>
+              <li>온라인 서류 신청</li>
+              <li>도면 보기</li>
+              <li>담당자 접수·검토</li>
+            </ul>
+            <p class="fm-note">주민과 담당자가 같은 필지 정보를 봅니다.</p>
+          </li>
+
+          <li class="fm-col">
+            <p class="fm-step">3</p>
+            <h3>우리 서비스</h3>
+            <ul class="fm-list">
+              <li>재산 정보 모아서 보여주기</li>
+              <li>신청서 접수·처리</li>
+              <li>재산대장 DB</li>
+              <li>신청서 DB</li>
+            </ul>
+            <p class="fm-note">허가·포기·매각 결과를 대장에 되돌려 반영합니다.</p>
+          </li>
+
+          <li class="fm-col fm-col-ext">
+            <p class="fm-step">4</p>
+            <h3>외부 데이터</h3>
+            <ul class="fm-list fm-list-ext">
+              <li><span class="owner-dot owner-dot-kuk" aria-hidden="true"></span>e나라재산 국유재산포털<small>기획재정부 · 국유</small></li>
+              <li><span class="owner-dot owner-dot-si" aria-hidden="true"></span>대전광역시 재산정보 공개시스템<small>회계과 · 시유, 구유</small></li>
+              <li><span class="owner-dot owner-dot-gu" aria-hidden="true"></span>서구 공유재산 대장<small>토지정보과 내부 · 구유</small></li>
+              <li><span class="owner-dot" aria-hidden="true"></span>브이월드<small>국토교통부 · 지도, 지적도</small></li>
+              <li><span class="owner-dot" aria-hidden="true"></span>토지이음<small>국토교통부 · 토지이용계획</small></li>
+              <li><span class="owner-dot" aria-hidden="true"></span>문자 알림 서비스<small>구청 기존 계약</small></li>
+            </ul>
+          </li>
+        </ol>
+
+        <p class="fm-legend">
+          <span><span class="arrow arrow-out" aria-hidden="true"></span>보내는 것: 지번 검색, 필지 정보 요청, 신청서 제출</span>
+          <span><span class="arrow arrow-back" aria-hidden="true"></span>돌아오는 것: 필지 정보, 처리 결과 알림</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- 외부 데이터 -->
+    <section class="section sources" id="sources" aria-labelledby="sources-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="sources-title">외부 데이터를 어디서 받아오나</h2>
+          <p>2026년 9월 16일에 각 시스템을 직접 확인한 결과입니다.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table class="srctable">
+            <caption class="sr-only">국·공유재산 외부 데이터 연계 검토 결과</caption>
+            <thead>
+              <tr><th scope="col">구분</th><th scope="col">시스템</th><th scope="col">확인한 내용</th><th scope="col">연계</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><span class="owner-dot owner-dot-kuk" aria-hidden="true"></span>국유</th>
+                <td><a href="https://www.k-pis.go.kr/addMapView.do" target="_blank" rel="noopener">e나라재산 국유재산포털</a><small>기획재정부</small></td>
+                <td>일반재산, 매각대상, 대부대상, 사용중인재산을 지도에서 조회. 부동산 검색에 브이월드 오픈API를 쓴다고 밝히고 있음</td>
+                <td><span class="tag tag-wait">준비 중</span><small>필지별 조회는 공공데이터포털 오픈API 인증키 필요</small></td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="owner-dot owner-dot-si" aria-hidden="true"></span>시유</th>
+                <td><a href="https://www.daejeon.go.kr/jaesan/PropertyList.do" target="_blank" rel="noopener">대전광역시 재산정보 공개시스템</a><small>대전광역시 회계과</small></td>
+                <td>서구 시유재산 <strong>2,415건</strong>. 재산번호, 소재지, 재산관리관, 지목, 실면적, 회계기준가액. 대부·미대부로 걸러낼 수 있음</td>
+                <td><span class="tag tag-ok">연계됨</span><small>첫 화면 지도에 실제 건수 반영</small></td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="owner-dot owner-dot-gu" aria-hidden="true"></span>구유</th>
+                <td>같은 시스템 + <strong>서구 공유재산 대장</strong><small>서구청 토지정보과</small></td>
+                <td>서구 구유재산 <strong>3,600건</strong>. 다만 <strong>대부 정보는 시 시스템에 없음</strong>(일반재산 18건만 등록, 대부·미대부 구분 0건)</td>
+                <td><span class="tag tag-ok">연계됨</span><small>활용 가능 여부는 구청 내부 대장을 이어야 함</small></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="findings">
+          <h3>확인하면서 드러난 것</h3>
+          <ul>
+            <li>
+              <strong>구유재산은 대부 정보를 시가 들고 있지 않습니다.</strong>
+              그래서 「지금 빌릴 수 있는 구유지」는 구청 내부 대장을 연계하지 않으면 주민에게 보여줄 방법이 없습니다.
+              이 서비스를 구청이 만들어야 하는 이유이기도 합니다.
+            </li>
+            <li>
+              서구 사전정보공개의 「유휴 공유재산 공개 목록」은 공공누리 <strong>제4유형(변경금지)</strong>입니다.
+              공개 파일을 가공해 싣는 대신, 그 파일을 만드는 <strong>토지정보과의 원본 대장을 직접 연계</strong>합니다.
+              갱신 주기도 월 1회에서 실시간으로 바뀝니다.
+            </li>
+            <li>
+              시유 일반재산 중 지금 빌릴 수 있는 <strong>미대부 재산은 55건</strong>입니다.
+              정림동 11건, 괴곡동 10건, 원정동 6건 순입니다.
+            </li>
+          </ul>
+        </div>
+
+        <p class="plan-back"><a class="btn btn-outline" href="index.html">랜딩 페이지로 돌아가기</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div>
+        <p class="footer-name">흩어진 국·공유재산을 한곳에, 신청까지 원스톱!</p>
+        <p class="footer-slogan">구민주권 행복도시 서구</p>
+      </div>
+      <div class="footer-meta">
+        <p><span class="footer-label">기획</span>서구청 토지정보과 윤혜림</p>
+        <p class="notice">AI 교육 실습용 기획안이며 현재 운영 중인 서비스가 아닙니다. 시유·구유 건수는 대전광역시 재산정보 공개시스템의 2026년 4월 기준 실제 자료이고, 지도 위 필지 위치와 국유 표시는 예시입니다.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
