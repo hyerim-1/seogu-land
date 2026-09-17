@@ -320,6 +320,39 @@ h3 { font-size: 1.125rem; line-height: 1.45; letter-spacing: -0.01em; }
 .pains h3 { margin-top: 16px; }
 .pains p { margin-top: 6px; color: var(--ink-soft); font-size: 0.9375rem; }
 
+/* 현행 → 개선 비교표 */
+.compare { margin-top: clamp(28px, 3.5vw, 40px); }
+.compare-title { font-weight: 700; font-size: 1.125rem; color: var(--navy-deep); margin-bottom: 12px; }
+.compare-table {
+  width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed;
+  border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; font-size: 0.9375rem;
+}
+.compare-table th, .compare-table td { padding: 14px 18px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.compare-table tbody tr:last-child > * { border-bottom: 0; }
+.compare-table thead th { font-size: 0.875rem; font-weight: 700; }
+.compare-table thead th:first-child, .compare-table tbody th { width: 8.5em; background: var(--surface-2); color: var(--ink-soft); font-weight: 600; }
+.compare-table .col-now { background: var(--surface-2); color: var(--ink-soft); }
+.compare-table .col-new { background: var(--navy-tint); color: var(--navy-deep); font-weight: 500; }
+.compare-table thead .col-new { background: var(--navy); color: #fff; }
+.compare-table td.col-now, .compare-table tbody th, .compare-table thead th:first-child { border-right: 1px solid var(--line); }
+.sys-list { list-style: none; display: grid; gap: 8px; }
+.sys-list li { display: flex; align-items: center; gap: 8px; }
+.sys-list strong { color: var(--ink); }
+.program-name { font-size: 1.125rem; font-weight: 700; line-height: 1.45; color: var(--navy-deep); }
+.compare-note { margin-top: 8px; font-size: 0.8125rem; font-weight: 400; color: var(--ink-mute); }
+.compare-table .col-new .compare-note { color: var(--navy); }
+
+@media (max-width: 640px) {
+  /* 좁은 화면에서는 줄마다 현행·개선을 위아래로 */
+  .compare-table, .compare-table tbody, .compare-table tr, .compare-table th, .compare-table td { display: block; width: auto; }
+  .compare-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .compare-table tbody th { width: auto; border-bottom: 0; border-right: 0; padding-bottom: 6px; }
+  .compare-table td { border-bottom: 0; }
+  .compare-table td.col-now { border-right: 0; }
+  .compare-table td::before { content: attr(data-label); display: block; margin-bottom: 4px; font-size: 0.75rem; font-weight: 700; }
+  .compare-table tbody tr:not(:last-child) { border-bottom: 1px solid var(--line); }
+}
+
 /* ---------- 3. 기능 ---------- */
 .sheets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2vw, 20px); }
 .sheet {
