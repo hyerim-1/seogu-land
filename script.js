@@ -7,11 +7,26 @@ const OWNER_LABEL = { kuk: '국유', si: '시유', gu: '구유' };
 const STATUS_LABEL = { lease: '대부 중', permit: '사용허가 중', available: '활용 가능', unavailable: '대부 불가' };
 // 토지이음 토지이용계획 열람 페이지(새 창으로 열기)
 const EUM_LAND_PLAN_URL = 'https://www.eum.go.kr/web/ar/lu/luLandDet.jsp';
-const DOCS = [
-  { key: 'apply', name: '사용(대부)허가 신청서' },
-  { key: 'buy', name: '매수신청서' },
-  { key: 'giveup', name: '사용(대부)허가 포기서' },
+// 필지에서 할 수 있는 신청 종류
+const KINDS = [
+  { key: 'apply', name: '사용허가·대부' },
+  { key: 'buy', name: '매수' },
+  { key: 'giveup', name: '반환·해지' },
 ];
+// 재산마다 관리 부서가 달라 온라인 접수 대신, 맞는 서식(forms/)과 접수처를 안내
+// files: 신청 종류별 서식. 시유는 대전광역시 서식이라 파일 없이 문의 안내만 함
+const KUK_APPLY = { name: '국유재산 사용허가·대부·매수 신청서', file: 'forms/kuk-01-apply.hwp' };
+const FORMS = {
+  kuk: { to: '재산을 관리하는 중앙관서 또는 한국자산관리공사', files: { apply: KUK_APPLY, buy: KUK_APPLY } },
+  si: { to: '대전광역시 해당 재산관리관 부서', files: {} },
+  gu: {
+    to: '대전 서구 해당 재산관리관 부서',
+    files: {
+      apply: { name: '대부(사용허가) 신청서', file: 'forms/gu-19-apply.hwp' },
+      buy: { name: '공유재산 매수신청서', file: 'forms/gu-16-2-buy-apply.hwpx' },
+    },
+  },
+};
 
 // 예시 필지: points는 480x360 지도 좌표
 const PARCELS = [
@@ -20,7 +35,7 @@ const PARCELS = [
     owner: 'gu', ownerName: '대전광역시 서구', status: 'lease',
     statusDetail: '주거용으로 대부 중이며, 대부 기간은 2025년 3월부터 2030년 2월까지입니다.',
     docs: { apply: false, buy: true, giveup: true },
-    hint: '이미 대부 중인 땅이라 새 사용(대부)허가 신청은 받지 않습니다. 현재 대부받은 분은 매수신청서나 포기서를 낼 수 있습니다.',
+    hint: '이미 대부 중인 땅이라 새 대부 신청은 받지 않습니다. 지금 대부받은 분은 매수나 대부 해지를 접수처에 문의할 수 있습니다.',
     zoning: { area: '제2종일반주거지역', district: '없음', zone: '가축사육제한구역' },
     use: 'house', useText: '단독주택 1동과 마당이 있습니다.',
     points: [[96, 12], [190, 12], [186, 76], [90, 80]],
@@ -30,7 +45,7 @@ const PARCELS = [
     owner: 'kuk', ownerName: '기획재정부', status: 'available',
     statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
     docs: { apply: true, buy: true, giveup: false },
-    hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
+    hint: '서식을 받아 접수처에 내면, 심사와 입찰 같은 이후 절차는 담당 기관에서 안내합니다.',
     zoning: { area: '제2종일반주거지역', district: '없음', zone: '가축사육제한구역' },
     use: 'bare', useText: '건물 없이 비어 있는 땅입니다.',
     points: [[90, 80], [244, 74], [244, 164], [84, 164]],
@@ -40,7 +55,7 @@ const PARCELS = [
     owner: 'si', ownerName: '대전광역시', status: 'permit',
     statusDetail: '주민 텃밭으로 사용허가 중이며, 허가 기간은 2026년 12월까지입니다.',
     docs: { apply: false, buy: false, giveup: true },
-    hint: '공원은 행정재산이라 매각 대상이 아닙니다. 현재 사용허가를 받은 분은 포기서를 낼 수 있습니다.',
+    hint: '공원은 행정재산이라 매각 대상이 아닙니다. 지금 사용허가를 받은 분은 허가 반환을 접수처에 문의할 수 있습니다.',
     zoning: { area: '자연녹지지역', district: '없음', zone: '도시·군계획시설(근린공원)' },
     use: 'garden', useText: '주민 텃밭으로 가꾸고 있습니다.',
     points: [[372, 12], [468, 12], [468, 88], [372, 92]],
@@ -50,7 +65,7 @@ const PARCELS = [
     owner: 'kuk', ownerName: '기획재정부', status: 'available',
     statusDetail: '지금 사용하는 사람이 없어 사용(대부)허가나 매수를 신청할 수 있습니다.',
     docs: { apply: true, buy: true, giveup: false },
-    hint: '포기서는 이 땅을 사용·대부 중인 분만 낼 수 있습니다.',
+    hint: '서식을 받아 접수처에 내면, 심사와 입찰 같은 이후 절차는 담당 기관에서 안내합니다.',
     zoning: { area: '자연녹지지역', district: '없음', zone: '개발제한구역' },
     use: 'field', useText: '밭고랑만 남아 있고 경작하지 않고 있습니다.',
     points: [[372, 92], [468, 88], [468, 164], [380, 164]],
@@ -74,7 +89,7 @@ const PARCELS = [
     owner: 'kuk', ownerName: '기획재정부', status: 'permit',
     statusDetail: '공영주차장으로 사용허가 중이며, 허가 기간은 2027년 6월까지입니다.',
     docs: { apply: false, buy: false, giveup: true },
-    hint: '행정재산으로 쓰이고 있어 매각 대상이 아닙니다. 현재 사용허가를 받은 분은 포기서를 낼 수 있습니다.',
+    hint: '행정재산으로 쓰이고 있어 매각 대상이 아닙니다. 지금 사용허가를 받은 분은 허가 반환을 접수처에 문의할 수 있습니다.',
     zoning: { area: '일반상업지역', district: '방화지구', zone: '도시·군계획시설(주차장)' },
     use: 'parking', useText: '공영주차장으로 쓰고 있습니다.',
     points: [[360, 200], [468, 200], [468, 348], [352, 348], [356, 270]],
@@ -100,7 +115,6 @@ const ROADS = [
 ];
 
 const state = { selectedId: null, drawing: 'cadastral' };
-let toastTimer = null;
 
 // ---------- 도우미 ----------
 function svgEl(tag, attrs = {}, parent) {
@@ -179,6 +193,10 @@ function selectParcel(id) {
 function renderCard(parcel) {
   const card = document.getElementById('demo-card');
   const statusClass = parcel.status === 'available' ? ' status-available' : '';
+  const kinds = KINDS.filter((k) => parcel.docs[k.key]);
+  const form = FORMS[parcel.owner];
+  // 신청 가능한 종류에 맞는 서식만, 같은 파일은 한 번만
+  const files = [...new Map(kinds.map((k) => form.files[k.key]).filter(Boolean).map((f) => [f.file, f])).values()];
 
   card.innerHTML = `
     <div class="card-tags">
@@ -233,12 +251,17 @@ function renderCard(parcel) {
       </div>
     </div>` : ''}
     <div class="docs">
-      <p class="docs-title">서류 신청</p>
+      <p class="docs-title">신청 서식·접수처</p>
+      <dl class="docs-facts">
+        <div><dt>신청 가능</dt><dd>${kinds.length
+          ? `<span class="kind-chips">${kinds.map((k) => `<span class="kind-chip">${k.name}</span>`).join('')}</span>`
+          : '지금은 신청 대상이 아닙니다'}</dd></div>
+        <div><dt>접수처</dt><dd>${form.to}</dd></div>
+      </dl>
       <div class="docs-list">
-        ${DOCS.map((d) => `
-          <button type="button" class="doc-btn" data-doc="${d.name}" ${parcel.docs[d.key] ? '' : 'disabled'}>
-            ${d.name}<small>${parcel.docs[d.key] ? '작성하기' : '해당 없음'}</small>
-          </button>`).join('')}
+        ${files.map((f) => `
+          <a class="doc-btn" href="${f.file}" download>${f.name}<small>${f.file.split('.').pop().toUpperCase()} 받기</small></a>`).join('')}
+        ${kinds.length && !files.length ? '<a class="doc-btn" href="#forms">서식 모음에서 안내 보기<small>이동</small></a>' : ''}
       </div>
       <p class="docs-hint">${parcel.hint}</p>
     </div>`;
@@ -246,10 +269,6 @@ function renderCard(parcel) {
   card.querySelectorAll('[data-drawing]').forEach((btn) => {
     btn.addEventListener('click', () => setDrawing(btn.dataset.drawing));
   });
-  card.querySelectorAll('.doc-btn:not(:disabled)').forEach((btn) => {
-    btn.addEventListener('click', () => showToast(btn.dataset.doc));
-  });
-  hideToast();
   setDrawing(state.drawing);
 }
 
@@ -430,19 +449,6 @@ function drawLocation(svg, parcel) {
   svgEl('circle', { class: 'dw-pin', cx, cy, r: 9 }, svg);
   const label = svgEl('text', { class: 'dw-label', x: cx, y: cy < 60 ? cy + 32 : cy - 18, 'font-size': 15 }, svg);
   label.textContent = '대상지';
-}
-
-// ---------- 서류 버튼 안내 ----------
-function showToast(docName) {
-  const toast = document.getElementById('demo-toast');
-  toast.textContent = `예시 화면입니다. 실제 서비스에서는 여기서 ${docName} 작성 화면이 열립니다.`;
-  toast.hidden = false;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(hideToast, 5000);
-}
-function hideToast() {
-  const toast = document.getElementById('demo-toast');
-  if (toast) toast.hidden = true;
 }
 
 // ---------- 사용자 탭 ----------
